@@ -1,0 +1,128 @@
+.container {
+    max-width: 900px;
+}
+
+.header {
+    margin-bottom: var(--spacing-xl);
+}
+
+.header h1 {
+    font-size: 1.75rem;
+    margin-bottom: var(--spacing-xs);
+}
+
+.subtitle {
+    color: var(--color-text-secondary);
+    margin: 0;
+}
+
+/* Add Form */
+.addForm {
+    background: var(--color-surface);
+    padding: var(--spacing-xl);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+    margin-bottom: var(--spacing-xl);
+}
+
+.addForm h2 {
+    font-size: 1.125rem;
+    margin-bottom: var(--spacing-lg);
+    color: var(--color-primary);
+}
+
+.form {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+}
+
+.formGrid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--spacing-md);
+}
+
+/* Users List */
+.usersList {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+}
+
+/* User Card */
+.userCard {
+    background: var(--color-surface);
+    padding: var(--spacing-lg);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-lg);
+}
+
+.userCard.inactive {
+    opacity: 0.6;
+}
+
+.userInfo {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+    flex: 1;
+}
+
+.avatar {
+    width: 50px;
+    height: 50px;
+    border-radius: var(--radius-full);
+    background: linear-gradient(135deg, var(--color-secondary), var(--color-accent));
+    color: white;
+    font-weight: 700;
+    font-size: 1.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.userInfo h3 {
+    margin-bottom: var(--spacing-xs);
+}
+
+.userInfo p {
+    font-size: 0.9rem;
+    color: var(--color-text-secondary);
+    margin-bottom: var(--spacing-xs);
+}
+
+.badges {
+    display: flex;
+    gap: var(--spacing-sm);
+}
+
+.userStats {
+    color: var(--color-text-secondary);
+    font-size: 0.9rem;
+}
+
+.userActions {
+    display: flex;
+    gap: var(--spacing-sm);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .formGrid {
+        grid-template-columns: 1fr;
+    }
+
+    .userCard {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .userActions {
+        width: 100%;
+        justify-content: flex-end;
+    }
+}

@@ -1,0 +1,370 @@
+.page {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background: var(--color-background);
+}
+
+/* Header */
+.header {
+    background: var(--primary, var(--color-primary));
+    padding: var(--spacing-md) var(--spacing-xl);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: var(--shadow-md);
+}
+
+.headerContent {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+}
+
+.logo {
+    height: 50px;
+    width: auto;
+}
+
+.companyName {
+    color: white;
+    font-size: 1.5rem;
+    margin: 0;
+}
+
+/* Hero */
+.hero {
+    position: relative;
+    height: 400px;
+    overflow: hidden;
+}
+
+.heroImage {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.heroOverlay {
+    position: absolute;
+    top: var(--spacing-md);
+    right: var(--spacing-md);
+}
+
+/* Main */
+.main {
+    flex: 1;
+    max-width: 1200px;
+    width: 100%;
+    margin: 0 auto;
+    padding: var(--spacing-xl);
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xl);
+}
+
+/* Info Card */
+.infoCard {
+    background: var(--color-surface);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-lg);
+    padding: var(--spacing-xl);
+    margin-top: calc(var(--spacing-xl) * -2);
+    position: relative;
+    z-index: 10;
+}
+
+.infoHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: var(--spacing-xl);
+    margin-bottom: var(--spacing-xl);
+}
+
+.propertyType {
+    display: inline-block;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--color-secondary);
+    margin-bottom: var(--spacing-xs);
+}
+
+.propertyTitle {
+    font-size: 1.75rem;
+    margin-bottom: var(--spacing-sm);
+    color: var(--color-primary);
+}
+
+.propertyAddress {
+    color: var(--color-text-secondary);
+    font-size: 0.95rem;
+    margin: 0;
+}
+
+/* Price Box */
+.priceBox {
+    text-align: right;
+    flex-shrink: 0;
+}
+
+.priceLabel {
+    display: block;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--color-text-secondary);
+}
+
+.price {
+    display: block;
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--accent, var(--color-accent));
+    font-family: var(--font-display);
+}
+
+.fees {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xs);
+    margin-top: var(--spacing-sm);
+    font-size: 0.85rem;
+    color: var(--color-text-secondary);
+}
+
+/* Features */
+.features {
+    display: flex;
+    gap: var(--spacing-xl);
+    padding-top: var(--spacing-lg);
+    border-top: 1px solid var(--color-border);
+    flex-wrap: wrap;
+}
+
+.feature {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    min-width: 80px;
+}
+
+.featureIcon {
+    font-size: 2rem;
+    margin-bottom: var(--spacing-xs);
+}
+
+.featureValue {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--color-primary);
+}
+
+.featureLabel {
+    font-size: 0.8rem;
+    color: var(--color-text-secondary);
+}
+
+/* Sections */
+.section {
+    background: var(--color-surface);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-xl);
+    box-shadow: var(--shadow-sm);
+}
+
+.sectionTitle {
+    font-size: 1.25rem;
+    margin-bottom: var(--spacing-md);
+    color: var(--color-primary);
+}
+
+.description {
+    white-space: pre-wrap;
+    line-height: 1.7;
+    color: var(--color-text);
+}
+
+/* Gallery */
+.gallery {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--spacing-md);
+}
+
+.galleryItem {
+    aspect-ratio: 4/3;
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    cursor: pointer;
+    transition: transform var(--transition-normal);
+}
+
+.galleryItem:hover {
+    transform: scale(1.02);
+}
+
+.galleryItem img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* Share Section */
+.shareSection {
+    background: var(--color-surface);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-xl);
+    box-shadow: var(--shadow-sm);
+    text-align: center;
+}
+
+.shareText {
+    color: var(--color-text-secondary);
+    margin-bottom: var(--spacing-lg);
+}
+
+.shareButtons {
+    display: flex;
+    justify-content: center;
+    gap: var(--spacing-md);
+    flex-wrap: wrap;
+}
+
+.shareBtn {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    padding: var(--spacing-md) var(--spacing-xl);
+    border-radius: var(--radius-full);
+    font-weight: 500;
+    font-size: 0.95rem;
+    text-decoration: none;
+    border: none;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.shareBtn[data-type="whatsapp"] {
+    background: #25D366;
+    color: white;
+}
+
+.shareBtn[data-type="email"] {
+    background: var(--secondary, var(--color-secondary));
+    color: white;
+}
+
+.shareBtn[data-type="copy"] {
+    background: var(--color-border);
+    color: var(--color-text);
+}
+
+.shareBtn:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+/* About Section */
+.aboutSection {
+    background: var(--color-surface);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-xl);
+    box-shadow: var(--shadow-sm);
+}
+
+.contactInfo {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-lg);
+    margin-top: var(--spacing-lg);
+    padding-top: var(--spacing-lg);
+    border-top: 1px solid var(--color-border);
+}
+
+.contactItem {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    color: var(--color-text-secondary);
+    text-decoration: none;
+    transition: color var(--transition-fast);
+}
+
+.contactItem:hover {
+    color: var(--color-secondary);
+}
+
+/* Footer */
+.footer {
+    background: var(--primary, var(--color-primary));
+    color: rgba(255, 255, 255, 0.7);
+    padding: var(--spacing-xl);
+    text-align: center;
+    margin-top: auto;
+}
+
+.footer p {
+    margin: 0;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+    .gallery {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .hero {
+        height: 250px;
+    }
+
+    .infoHeader {
+        flex-direction: column;
+    }
+
+    .priceBox {
+        text-align: left;
+        width: 100%;
+        padding-top: var(--spacing-md);
+        border-top: 1px solid var(--color-border);
+    }
+
+    .propertyTitle {
+        font-size: 1.5rem;
+    }
+
+    .price {
+        font-size: 1.75rem;
+    }
+
+    .features {
+        justify-content: center;
+    }
+
+    .gallery {
+        grid-template-columns: 1fr;
+    }
+
+    .shareButtons {
+        flex-direction: column;
+    }
+
+    .shareBtn {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .main {
+        padding: var(--spacing-md);
+    }
+
+    .infoCard {
+        margin-top: calc(var(--spacing-md) * -1);
+    }
+}

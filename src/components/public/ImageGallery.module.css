@@ -1,0 +1,253 @@
+/* Thumbnail Grid */
+.grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--spacing-md);
+}
+
+.thumbnail {
+    position: relative;
+    aspect-ratio: 4/3;
+    border: none;
+    padding: 0;
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    cursor: pointer;
+    background: var(--color-border);
+}
+
+.thumbnail img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform var(--transition-normal);
+}
+
+.thumbnail:hover img {
+    transform: scale(1.05);
+}
+
+.overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0);
+    transition: background var(--transition-fast);
+}
+
+.thumbnail:hover .overlay {
+    background: rgba(0, 0, 0, 0.4);
+}
+
+.zoomIcon {
+    font-size: 1.5rem;
+    opacity: 0;
+    transform: scale(0.8);
+    transition: all var(--transition-fast);
+}
+
+.thumbnail:hover .zoomIcon {
+    opacity: 1;
+    transform: scale(1);
+}
+
+/* Lightbox */
+.lightbox {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    background: rgba(0, 0, 0, 0.95);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+.closeBtn {
+    position: absolute;
+    top: var(--spacing-md);
+    right: var(--spacing-md);
+    width: 44px;
+    height: 44px;
+    border: none;
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    font-size: 1.5rem;
+    border-radius: var(--radius-full);
+    cursor: pointer;
+    transition: background var(--transition-fast);
+    z-index: 10;
+}
+
+.closeBtn:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.lightboxContent {
+    width: 100%;
+    max-width: 1200px;
+    height: 100%;
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: var(--spacing-xl);
+    position: relative;
+}
+
+/* Navigation Buttons */
+.navBtn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 50px;
+    height: 50px;
+    border: none;
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    font-size: 2rem;
+    border-radius: var(--radius-full);
+    cursor: pointer;
+    transition: background var(--transition-fast);
+    z-index: 10;
+}
+
+.navBtn:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.prevBtn {
+    left: var(--spacing-md);
+}
+
+.nextBtn {
+    right: var(--spacing-md);
+}
+
+/* Image Container */
+.imageContainer {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    max-width: 100%;
+    overflow: hidden;
+}
+
+.imageContainer img {
+    max-width: 100%;
+    max-height: 70vh;
+    object-fit: contain;
+    border-radius: var(--radius-md);
+    animation: scaleIn 0.2s ease;
+}
+
+@keyframes scaleIn {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+/* Footer */
+.footer {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--spacing-lg);
+    margin-top: var(--spacing-lg);
+    color: white;
+}
+
+.caption {
+    margin: 0;
+    font-size: 0.95rem;
+    opacity: 0.9;
+}
+
+.counter {
+    padding: var(--spacing-xs) var(--spacing-md);
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: var(--radius-full);
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+
+/* Thumbnail Strip */
+.thumbnailStrip {
+    display: flex;
+    gap: var(--spacing-sm);
+    margin-top: var(--spacing-lg);
+    padding: var(--spacing-sm);
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: var(--radius-md);
+    overflow-x: auto;
+    max-width: 100%;
+}
+
+.stripThumb {
+    width: 60px;
+    height: 45px;
+    border: 2px solid transparent;
+    padding: 0;
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+    cursor: pointer;
+    flex-shrink: 0;
+    opacity: 0.6;
+    transition: all var(--transition-fast);
+}
+
+.stripThumb:hover {
+    opacity: 0.9;
+}
+
+.stripThumb.active {
+    border-color: white;
+    opacity: 1;
+}
+
+.stripThumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .navBtn {
+        width: 40px;
+        height: 40px;
+        font-size: 1.5rem;
+    }
+
+    .imageContainer img {
+        max-height: 60vh;
+    }
+
+    .thumbnailStrip {
+        display: none;
+    }
+}

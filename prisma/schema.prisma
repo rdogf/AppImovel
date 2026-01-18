@@ -1,0 +1,77 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id         String     @id @default(cuid())
+  email      String     @unique
+  password   String
+  name       String
+  role       String     @default("admin") // master, admin
+  active     Boolean    @default(true)
+  properties Property[]
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
+}
+
+model Settings {
+  id             String  @id @default(cuid())
+  primaryColor   String  @default("#1a1a2e")
+  secondaryColor String  @default("#e94560")
+  accentColor    String  @default("#f5a623")
+  logoUrl        String?
+  companyName    String  @default("Minha Imobiliária")
+  aboutTitle     String  @default("Sobre Nós")
+  aboutText      String  @default("Somos uma imobiliária especializada em imóveis de alto padrão.")
+  whatsappNumber String?
+  email          String?
+  address        String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+model Property {
+  id              String   @id @default(cuid())
+  title           String
+  address         String
+  neighborhood    String
+  city            String
+  state           String   @default("RJ")
+  totalArea       Float
+  propertyType    String   // Apartamento, Casa, Cobertura, Terreno, Sala Comercial
+  bedrooms        Int      @default(0)
+  suites          Int      @default(0)
+  bathrooms       Int      @default(0)
+  parkingSpaces   Int      @default(0)
+  characteristics String   // Descrição detalhada
+  price           Float
+  condoFee        Float?
+  iptu            Float?
+  status          String   @default("disponivel") // disponivel, vendido, reservado, alugado
+  featured        Boolean  @default(false)
+  active          Boolean  @default(true)         // Soft delete
+  shareCode       String   @unique @default(cuid())
+  photos          Photo[]
+  user            User?    @relation(fields: [userId], references: [id])
+  userId          String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+model Photo {
+  id         String   @id @default(cuid())
+  url        String
+  caption    String?
+  order      Int      @default(0)
+  property   Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  propertyId String
+  createdAt  DateTime @default(now())
+}

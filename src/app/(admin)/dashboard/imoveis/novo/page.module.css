@@ -1,0 +1,107 @@
+.container {
+    max-width: 900px;
+}
+
+.header {
+    margin-bottom: var(--spacing-xl);
+}
+
+.backLink {
+    display: inline-block;
+    color: var(--color-text-secondary);
+    font-size: 0.9rem;
+    margin-bottom: var(--spacing-sm);
+    transition: color var(--transition-fast);
+}
+
+.backLink:hover {
+    color: var(--color-secondary);
+}
+
+.header h1 {
+    font-size: 1.75rem;
+    margin: 0;
+}
+
+/* Form Sections */
+.form {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xl);
+}
+
+.section {
+    background: var(--color-surface);
+    padding: var(--spacing-xl);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+}
+
+.sectionTitle {
+    font-size: 1.125rem;
+    margin-bottom: var(--spacing-lg);
+    padding-bottom: var(--spacing-md);
+    border-bottom: 1px solid var(--color-border);
+    color: var(--color-primary);
+}
+
+/* Grid layouts */
+.grid2 {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--spacing-md);
+}
+
+.grid3 {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--spacing-md);
+}
+
+.grid4 {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--spacing-md);
+}
+
+/* Checkbox */
+.checkboxLabel {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    cursor: pointer;
+    font-weight: 500;
+}
+
+.checkboxLabel input {
+    width: 18px;
+    height: 18px;
+    accent-color: var(--color-secondary);
+}
+
+/* Actions */
+.actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: var(--spacing-md);
+    padding-top: var(--spacing-md);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+
+    .grid2,
+    .grid3,
+    .grid4 {
+        grid-template-columns: 1fr;
+    }
+
+    .actions {
+        flex-direction: column-reverse;
+    }
+
+    .actions button,
+    .actions a {
+        width: 100%;
+    }
+}
