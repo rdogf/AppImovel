@@ -31,8 +31,6 @@ export async function updateSettings(formData: FormData) {
 
     revalidatePath('/dashboard/configuracoes');
     revalidatePath('/imovel');
-
-    return { success: true };
 }
 
 export async function getSettings() {
