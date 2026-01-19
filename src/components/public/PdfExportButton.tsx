@@ -175,6 +175,7 @@ export default function PdfExportButton({ property, settings, variant = 'default
                 useCORS: true,
                 allowTaint: true,
                 logging: false,
+                backgroundColor: '#ffffff',
             });
 
             const pdf = new jsPDF({
@@ -188,28 +189,35 @@ export default function PdfExportButton({ property, settings, variant = 'default
             const imgWidth = pageWidth;
             const imgHeight = (canvas.height * imgWidth) / canvas.width;
 
-            // Add pages as needed
-            let heightLeft = imgHeight;
-            let position = 0;
-            let page = 0;
+            // If content fits on one page
+            if (imgHeight <= pageHeight) {
+                pdf.addImage(canvas.toDataURL('image/jpeg', 0.95), 'JPEG', 0, 0, imgWidth, imgHeight);
+            } else {
+                // Multiple pages needed - slice the canvas
+                const totalPages = Math.ceil(imgHeight / pageHeight);
+                const sourceHeight = canvas.height / totalPages;
 
-            while (heightLeft > 0) {
-                if (page > 0) {
-                    pdf.addPage();
+                for (let i = 0; i < totalPages; i++) {
+                    if (i > 0) pdf.addPage();
+
+                    // Create a canvas for this page slice
+                    const pageCanvas = document.createElement('canvas');
+                    pageCanvas.width = canvas.width;
+                    pageCanvas.height = sourceHeight;
+
+                    const ctx = pageCanvas.getContext('2d');
+                    if (ctx) {
+                        ctx.fillStyle = '#ffffff';
+                        ctx.fillRect(0, 0, pageCanvas.width, pageCanvas.height);
+                        ctx.drawImage(
+                            canvas,
+                            0, i * sourceHeight, canvas.width, sourceHeight,
+                            0, 0, pageCanvas.width, pageCanvas.height
+                        );
+                    }
+
+                    pdf.addImage(pageCanvas.toDataURL('image/jpeg', 0.95), 'JPEG', 0, 0, imgWidth, pageHeight);
                 }
-
-                pdf.addImage(
-                    canvas.toDataURL('image/jpeg', 0.92),
-                    'JPEG',
-                    0,
-                    -position,
-                    imgWidth,
-                    imgHeight
-                );
-
-                heightLeft -= pageHeight;
-                position += pageHeight;
-                page++;
             }
 
             const filename = `${property.title.replace(/[^a-zA-Z0-9]/g, '_')}.pdf`;
