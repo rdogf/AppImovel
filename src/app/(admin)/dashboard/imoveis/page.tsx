@@ -164,12 +164,25 @@ export default async function ImoveisPage({ searchParams }: Props) {
                             </div>
 
                             <div className={styles.cardActions}>
-                                <Link
-                                    href={`/dashboard/imoveis/${property.id}`}
-                                    className="btn btn-outline btn-sm"
-                                >
-                                    Editar
-                                </Link>
+                                {/* Can edit only own properties */}
+                                {(property.userId === session?.user?.id || !isMaster) ? (
+                                    <Link
+                                        href={`/dashboard/imoveis/${property.id}`}
+                                        className="btn btn-outline btn-sm"
+                                    >
+                                        Editar
+                                    </Link>
+                                ) : (
+                                    <form action={async () => {
+                                        'use server';
+                                        const { deleteProperty } = await import('./actions');
+                                        await deleteProperty(property.id);
+                                    }}>
+                                        <button type="submit" className="btn btn-danger btn-sm">
+                                            Desativar
+                                        </button>
+                                    </form>
+                                )}
                                 <Link
                                     href={`/imovel/${property.shareCode}`}
                                     className="btn btn-ghost btn-sm"

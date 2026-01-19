@@ -94,6 +94,37 @@
     justify-content: flex-end;
 }
 
+/* Master Badge */
+.masterBadge {
+    font-size: 0.7rem;
+    background: var(--color-accent);
+    color: white;
+    padding: 2px 8px;
+    border-radius: var(--radius-full);
+    margin-left: var(--spacing-sm);
+    font-weight: 500;
+    vertical-align: middle;
+}
+
+/* Info Box */
+.infoBox {
+    background: linear-gradient(135deg, #f0f4ff 0%, #e8f0ff 100%);
+    border: 1px solid #c5d4f5;
+    border-radius: var(--radius-md);
+    padding: var(--spacing-xl);
+    text-align: center;
+}
+
+.infoBox h3 {
+    margin: 0 0 var(--spacing-md) 0;
+    color: var(--color-primary);
+}
+
+.infoBox p {
+    margin: var(--spacing-sm) 0 0 0;
+    color: var(--color-text-secondary);
+}
+
 /* Responsive */
 @media (max-width: 768px) {
 

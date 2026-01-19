@@ -1,6 +1,7 @@
-import { notFound } from 'next/navigation';
+import { notFound, redirect } from 'next/navigation';
 import Link from 'next/link';
 import prisma from '@/lib/prisma';
+import { auth } from '@/lib/auth';
 import { updateProperty, deleteProperty, deletePhoto } from '../actions';
 import { updatePhotoOrder } from './photo-actions';
 import PhotoManager from '@/components/admin/PhotoManager';
@@ -23,6 +24,7 @@ async function handleUpdateOrder(propertyId: string, photoIds: string[]) {
 
 export default async function EditarImovelPage({ params }: Props) {
     const { id } = await params;
+    const session = await auth();
 
     const property = await prisma.property.findUnique({
         where: { id },
@@ -31,6 +33,15 @@ export default async function EditarImovelPage({ params }: Props) {
 
     if (!property) {
         notFound();
+    }
+
+    // Only owner can edit - master can only deactivate via list page
+    const isOwner = property.userId === session?.user?.id;
+    if (!isOwner && session?.user?.role !== 'admin') {
+        // Master trying to edit someone else's property - redirect
+        if (session?.user?.role === 'master' && property.userId !== session?.user?.id) {
+            redirect('/dashboard/imoveis');
+        }
     }
 
     const updatePropertyWithId = updateProperty.bind(null, id);
