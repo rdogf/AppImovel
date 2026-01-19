@@ -33,6 +33,22 @@ interface PropertyPdfButtonProps {
     };
 }
 
+// Convert image URL to base64
+async function imageToBase64(url: string): Promise<string> {
+    try {
+        const response = await fetch(url);
+        const blob = await response.blob();
+        return new Promise((resolve) => {
+            const reader = new FileReader();
+            reader.onloadend = () => resolve(reader.result as string);
+            reader.onerror = () => resolve(url); // Fallback to original URL
+            reader.readAsDataURL(blob);
+        });
+    } catch {
+        return url; // Fallback to original URL
+    }
+}
+
 export default function PropertyPdfButton({ property, settings }: PropertyPdfButtonProps) {
     const [generating, setGenerating] = useState(false);
 
@@ -50,6 +66,19 @@ export default function PropertyPdfButton({ property, settings }: PropertyPdfBut
             const { default: jsPDF } = await import('jspdf');
             const { default: html2canvas } = await import('html2canvas');
 
+            // Convert all images to base64 first
+            const mainPhotoBase64 = property.photos[0]?.url
+                ? await imageToBase64(property.photos[0].url)
+                : '';
+
+            const allPhotosBase64 = await Promise.all(
+                property.photos.map(p => imageToBase64(p.url))
+            );
+
+            const logoBase64 = settings.logoUrl
+                ? await imageToBase64(settings.logoUrl)
+                : null;
+
             const container = document.createElement('div');
             container.style.cssText = `
                 position: absolute;
@@ -60,16 +89,13 @@ export default function PropertyPdfButton({ property, settings }: PropertyPdfBut
                 font-family: Arial, sans-serif;
             `;
 
-            const mainPhoto = property.photos[0]?.url || '';
-            const allPhotos = property.photos.map(p => p.url);
-
-            const photoGridHtml = allPhotos.length > 1 ? `
+            const photoGridHtml = allPhotosBase64.length > 1 ? `
                 <div style="margin-top: 20px;">
-                    <h3 style="margin: 0 0 15px 0; color: ${settings.primaryColor}; font-size: 14px;">📸 Galeria de Fotos (${allPhotos.length})</h3>
+                    <h3 style="margin: 0 0 15px 0; color: ${settings.primaryColor}; font-size: 14px;">📸 Galeria de Fotos (${allPhotosBase64.length})</h3>
                     <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;">
-                        ${allPhotos.map(url => `
-                            <div style="border-radius: 8px; overflow: hidden; aspect-ratio: 4/3;">
-                                <img src="${url}" alt="Foto" style="width: 100%; height: 100%; object-fit: cover;" crossorigin="anonymous" />
+                        ${allPhotosBase64.map(url => `
+                            <div style="border-radius: 8px; overflow: hidden;">
+                                <img src="${url}" alt="Foto" style="width: 100%; height: 150px; object-fit: cover;" />
                             </div>
                         `).join('')}
                     </div>
@@ -77,11 +103,11 @@ export default function PropertyPdfButton({ property, settings }: PropertyPdfBut
             ` : '';
 
             container.innerHTML = `
-                <div style="padding: 40px;">
+                <div style="padding: 40px; background: white;">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; padding-bottom: 15px; border-bottom: 3px solid ${settings.primaryColor};">
                         <div>
-                            ${settings.logoUrl
-                    ? `<img src="${settings.logoUrl}" alt="Logo" style="max-height: 50px; max-width: 180px;" crossorigin="anonymous" />`
+                            ${logoBase64
+                    ? `<img src="${logoBase64}" alt="Logo" style="max-height: 50px; max-width: 180px;" />`
                     : `<h1 style="margin: 0; color: ${settings.primaryColor}; font-size: 24px;">${settings.companyName}</h1>`
                 }
                         </div>
@@ -91,9 +117,9 @@ export default function PropertyPdfButton({ property, settings }: PropertyPdfBut
                         </div>
                     </div>
 
-                    ${mainPhoto ? `
+                    ${mainPhotoBase64 ? `
                         <div style="margin-bottom: 20px; border-radius: 12px; overflow: hidden;">
-                            <img src="${mainPhoto}" alt="${property.title}" style="width: 100%; height: 300px; object-fit: cover;" crossorigin="anonymous" />
+                            <img src="${mainPhotoBase64}" alt="${property.title}" style="width: 100%; height: 300px; object-fit: cover;" />
                         </div>
                     ` : ''}
 
