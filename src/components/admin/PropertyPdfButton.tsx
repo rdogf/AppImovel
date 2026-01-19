@@ -1,43 +1,39 @@
 'use client';
 
 import { useState } from 'react';
-import styles from './PdfExportButton.module.css';
+import styles from '../public/PdfExportButton.module.css';
 
-interface PropertyData {
-    title: string;
-    address: string;
-    neighborhood: string;
-    city: string;
-    state: string;
-    totalArea: number;
-    propertyType: string;
-    bedrooms: number;
-    suites: number;
-    bathrooms: number;
-    parkingSpaces: number;
-    characteristics: string;
-    price: number;
-    condoFee: number | null;
-    iptu: number | null;
-    status: string;
-    photos: { url: string }[];
+interface PropertyPdfButtonProps {
+    property: {
+        id: string;
+        title: string;
+        address: string;
+        neighborhood: string;
+        city: string;
+        state: string;
+        totalArea: number;
+        propertyType: string;
+        bedrooms: number;
+        suites: number;
+        bathrooms: number;
+        parkingSpaces: number;
+        characteristics: string;
+        price: number;
+        condoFee: number | null;
+        iptu: number | null;
+        status: string;
+        photos: { url: string }[];
+    };
+    settings: {
+        companyName: string;
+        logoUrl: string | null;
+        primaryColor: string;
+        whatsappNumber: string | null;
+        email: string | null;
+    };
 }
 
-interface SettingsData {
-    companyName: string;
-    logoUrl: string | null;
-    primaryColor: string;
-    whatsappNumber: string | null;
-    email: string | null;
-}
-
-interface PdfExportButtonProps {
-    property: PropertyData;
-    settings: SettingsData;
-    variant?: 'default' | 'small';
-}
-
-export default function PdfExportButton({ property, settings, variant = 'default' }: PdfExportButtonProps) {
+export default function PropertyPdfButton({ property, settings }: PropertyPdfButtonProps) {
     const [generating, setGenerating] = useState(false);
 
     const formatCurrency = (value: number) => {
@@ -67,7 +63,6 @@ export default function PdfExportButton({ property, settings, variant = 'default
             const mainPhoto = property.photos[0]?.url || '';
             const allPhotos = property.photos.map(p => p.url);
 
-            // Create photo grid HTML for all photos (3 per row)
             const photoGridHtml = allPhotos.length > 1 ? `
                 <div style="margin-top: 20px;">
                     <h3 style="margin: 0 0 15px 0; color: ${settings.primaryColor}; font-size: 14px;">📸 Galeria de Fotos (${allPhotos.length})</h3>
@@ -83,7 +78,6 @@ export default function PdfExportButton({ property, settings, variant = 'default
 
             container.innerHTML = `
                 <div style="padding: 40px;">
-                    <!-- Header -->
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; padding-bottom: 15px; border-bottom: 3px solid ${settings.primaryColor};">
                         <div>
                             ${settings.logoUrl
@@ -97,14 +91,12 @@ export default function PdfExportButton({ property, settings, variant = 'default
                         </div>
                     </div>
 
-                    <!-- Main Photo -->
                     ${mainPhoto ? `
                         <div style="margin-bottom: 20px; border-radius: 12px; overflow: hidden;">
                             <img src="${mainPhoto}" alt="${property.title}" style="width: 100%; height: 300px; object-fit: cover;" crossorigin="anonymous" />
                         </div>
                     ` : ''}
 
-                    <!-- Title and Price -->
                     <div style="margin-bottom: 20px;">
                         <h2 style="margin: 0 0 8px 0; color: ${settings.primaryColor}; font-size: 22px;">${property.title}</h2>
                         <p style="margin: 0 0 8px 0; color: #666; font-size: 13px;">📍 ${property.address}, ${property.neighborhood} - ${property.city}/${property.state}</p>
@@ -112,7 +104,6 @@ export default function PdfExportButton({ property, settings, variant = 'default
                         ${property.condoFee ? `<p style="margin: 5px 0 0 0; color: #666; font-size: 11px;">Condomínio: ${formatCurrency(property.condoFee)}/mês</p>` : ''}
                     </div>
 
-                    <!-- Features Grid -->
                     <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 20px; padding: 15px; background: #f8f9fa; border-radius: 12px;">
                         <div style="text-align: center;">
                             <div style="font-size: 20px;">📐</div>
@@ -136,16 +127,13 @@ export default function PdfExportButton({ property, settings, variant = 'default
                         </div>
                     </div>
 
-                    <!-- Description -->
                     <div style="margin-bottom: 20px;">
                         <h3 style="margin: 0 0 10px 0; color: ${settings.primaryColor}; font-size: 14px;">Descrição</h3>
                         <p style="margin: 0; color: #444; font-size: 12px; line-height: 1.5; white-space: pre-wrap;">${property.characteristics}</p>
                     </div>
 
-                    <!-- All Photos Grid -->
                     ${photoGridHtml}
 
-                    <!-- Footer -->
                     <div style="margin-top: 25px; padding-top: 15px; border-top: 1px solid #ddd; text-align: center; color: #666; font-size: 10px;">
                         <p style="margin: 0;">Documento gerado por ${settings.companyName}</p>
                         ${settings.whatsappNumber ? `<p style="margin: 5px 0 0 0;">Entre em contato: ${settings.whatsappNumber}</p>` : ''}
@@ -155,13 +143,11 @@ export default function PdfExportButton({ property, settings, variant = 'default
 
             document.body.appendChild(container);
 
-            // Wait for images to load
             const images = container.querySelectorAll('img');
             await Promise.all(Array.from(images).map(img => {
                 return new Promise<void>((resolve) => {
-                    if (img.complete) {
-                        resolve();
-                    } else {
+                    if (img.complete) resolve();
+                    else {
                         img.onload = () => resolve();
                         img.onerror = () => resolve();
                     }
@@ -177,49 +163,30 @@ export default function PdfExportButton({ property, settings, variant = 'default
                 logging: false,
             });
 
-            const pdf = new jsPDF({
-                orientation: 'portrait',
-                unit: 'mm',
-                format: 'a4',
-            });
-
+            const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
             const pageWidth = 210;
             const pageHeight = 297;
             const imgWidth = pageWidth;
             const imgHeight = (canvas.height * imgWidth) / canvas.width;
 
-            // Add pages as needed
             let heightLeft = imgHeight;
             let position = 0;
             let page = 0;
 
             while (heightLeft > 0) {
-                if (page > 0) {
-                    pdf.addPage();
-                }
-
-                pdf.addImage(
-                    canvas.toDataURL('image/jpeg', 0.92),
-                    'JPEG',
-                    0,
-                    -position,
-                    imgWidth,
-                    imgHeight
-                );
-
+                if (page > 0) pdf.addPage();
+                pdf.addImage(canvas.toDataURL('image/jpeg', 0.92), 'JPEG', 0, -position, imgWidth, imgHeight);
                 heightLeft -= pageHeight;
                 position += pageHeight;
                 page++;
             }
 
-            const filename = `${property.title.replace(/[^a-zA-Z0-9]/g, '_')}.pdf`;
-            pdf.save(filename);
-
+            pdf.save(`${property.title.replace(/[^a-zA-Z0-9]/g, '_')}.pdf`);
             document.body.removeChild(container);
 
         } catch (error) {
-            console.error('PDF generation error:', error);
-            alert('Erro ao gerar PDF. Tente novamente.');
+            console.error('PDF error:', error);
+            alert('Erro ao gerar PDF');
         } finally {
             setGenerating(false);
         }
@@ -230,10 +197,10 @@ export default function PdfExportButton({ property, settings, variant = 'default
             type="button"
             onClick={generatePdf}
             disabled={generating}
-            className={`${styles.button} ${variant === 'small' ? styles.small : ''}`}
+            className={`${styles.button} ${styles.small}`}
             title="Gerar PDF"
         >
-            {generating ? '⏳' : '📄'} {variant !== 'small' && (generating ? 'Gerando...' : 'Gerar PDF')}
+            {generating ? '⏳' : '📄'}
         </button>
     );
 }

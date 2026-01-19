@@ -22,3 +22,11 @@
     opacity: 0.7;
     cursor: wait;
 }
+
+/* Small variant for admin list */
+.small {
+    padding: 6px 12px;
+    font-size: 0.85rem;
+    gap: 4px;
+    border-radius: 6px;
+}

@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { formatCurrency, getPropertyTypeLabel } from '@/lib/utils';
 import { auth } from '@/lib/auth';
 import PropertyFilters from '@/components/admin/PropertyFilters';
+import PropertyPdfButton from '@/components/admin/PropertyPdfButton';
 import styles from './page.module.css';
 
 interface Props {
@@ -45,15 +46,28 @@ export default async function ImoveisPage({ searchParams }: Props) {
         ...neighborhoodFilter,
     };
 
-    // Get properties
+    // Get properties with ALL photos for PDF
     const properties = await prisma.property.findMany({
         where: whereClause,
         orderBy: { createdAt: 'desc' },
         include: {
-            photos: { take: 1, orderBy: { order: 'asc' } },
+            photos: { orderBy: { order: 'asc' } },
             user: { select: { name: true } },
         },
     });
+
+    // Get user settings for PDF generation
+    const userSettings = session?.user?.id ? await prisma.userSettings.findUnique({
+        where: { userId: session.user.id }
+    }) : null;
+
+    const pdfSettings = {
+        companyName: userSettings?.companyName || 'Imobiliária',
+        logoUrl: userSettings?.logoUrl || null,
+        primaryColor: userSettings?.primaryColor || '#1a1a2e',
+        whatsappNumber: userSettings?.whatsappNumber || null,
+        email: userSettings?.email || null,
+    };
 
     // Get filter options (from all user's properties)
     const allProperties = await prisma.property.findMany({
@@ -190,6 +204,29 @@ export default async function ImoveisPage({ searchParams }: Props) {
                                 >
                                     Ver Público
                                 </Link>
+                                <PropertyPdfButton
+                                    property={{
+                                        id: property.id,
+                                        title: property.title,
+                                        address: property.address,
+                                        neighborhood: property.neighborhood,
+                                        city: property.city,
+                                        state: property.state,
+                                        totalArea: property.totalArea,
+                                        propertyType: property.propertyType,
+                                        bedrooms: property.bedrooms,
+                                        suites: property.suites,
+                                        bathrooms: property.bathrooms,
+                                        parkingSpaces: property.parkingSpaces,
+                                        characteristics: property.characteristics,
+                                        price: property.price,
+                                        condoFee: property.condoFee,
+                                        iptu: property.iptu,
+                                        status: property.status,
+                                        photos: property.photos.map(p => ({ url: p.url })),
+                                    }}
+                                    settings={pdfSettings}
+                                />
                             </div>
                         </div>
                     ))}
