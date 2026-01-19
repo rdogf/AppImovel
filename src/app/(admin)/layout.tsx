@@ -1,6 +1,7 @@
 import { auth, signOut } from '@/lib/auth';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
+import MobileSidebar from '@/components/admin/MobileSidebar';
 import styles from './layout.module.css';
 
 export default async function AdminLayout({
@@ -14,8 +15,22 @@ export default async function AdminLayout({
         redirect('/login');
     }
 
+    const handleLogout = async () => {
+        'use server';
+        await signOut({ redirectTo: '/login' });
+    };
+
     return (
         <div className={styles.container}>
+            {/* Mobile Sidebar */}
+            <MobileSidebar
+                userName={session.user?.name || 'Admin'}
+                userEmail={session.user?.email || ''}
+                userRole={session.user?.role || 'admin'}
+                onLogout={handleLogout}
+            />
+
+            {/* Desktop Sidebar */}
             <aside className={styles.sidebar}>
                 <div className={styles.logo}>
                     <Link href="/dashboard">
@@ -57,12 +72,7 @@ export default async function AdminLayout({
                             <span className={styles.userEmail}>{session.user?.email}</span>
                         </div>
                     </div>
-                    <form
-                        action={async () => {
-                            'use server';
-                            await signOut({ redirectTo: '/login' });
-                        }}
-                    >
+                    <form action={handleLogout}>
                         <button type="submit" className={styles.logoutBtn} title="Sair">
                             🚪
                         </button>
