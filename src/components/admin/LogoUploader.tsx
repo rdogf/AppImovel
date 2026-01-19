@@ -12,10 +12,10 @@ interface LogoUploaderProps {
 
 export default function LogoUploader({ currentLogo, inputName, label, recommendedSize }: LogoUploaderProps) {
     const [preview, setPreview] = useState<string | null>(currentLogo);
+    const [logoUrl, setLogoUrl] = useState<string>(currentLogo || '');
     const [uploading, setUploading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const inputRef = useRef<HTMLInputElement>(null);
-    const hiddenInputRef = useRef<HTMLInputElement>(null);
 
     const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
@@ -49,11 +49,9 @@ export default function LogoUploader({ currentLogo, inputName, label, recommende
             const data = await response.json();
 
             if (data.urls && data.urls.length > 0) {
-                setPreview(data.urls[0]);
-                // Update hidden input with URL
-                if (hiddenInputRef.current) {
-                    hiddenInputRef.current.value = data.urls[0];
-                }
+                const url = data.urls[0];
+                setPreview(url);
+                setLogoUrl(url);
             } else {
                 setError('Erro ao fazer upload');
             }
@@ -66,9 +64,7 @@ export default function LogoUploader({ currentLogo, inputName, label, recommende
 
     const handleRemove = () => {
         setPreview(null);
-        if (hiddenInputRef.current) {
-            hiddenInputRef.current.value = '';
-        }
+        setLogoUrl('');
         if (inputRef.current) {
             inputRef.current.value = '';
         }
@@ -114,13 +110,14 @@ export default function LogoUploader({ currentLogo, inputName, label, recommende
                 className={styles.fileInput}
             />
 
-            {/* Hidden input to submit the URL with the form */}
+            {/* Hidden input to submit the URL with the form - controlled value */}
             <input
-                ref={hiddenInputRef}
                 type="hidden"
                 name={inputName}
-                defaultValue={currentLogo || ''}
+                value={logoUrl}
+                readOnly
             />
         </div>
     );
 }
+
