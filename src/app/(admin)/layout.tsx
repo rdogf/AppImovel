@@ -1,8 +1,14 @@
 import { auth, signOut } from '@/lib/auth';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
+import prisma from '@/lib/prisma';
 import MobileSidebar from '@/components/admin/MobileSidebar';
 import styles from './layout.module.css';
+
+async function getAppName() {
+    const globalSettings = await prisma.globalSettings.findFirst();
+    return globalSettings?.appName || 'AppImóvel';
+}
 
 export default async function AdminLayout({
     children,
@@ -10,6 +16,7 @@ export default async function AdminLayout({
     children: React.ReactNode;
 }) {
     const session = await auth();
+    const appName = await getAppName();
 
     if (!session) {
         redirect('/login');
@@ -27,6 +34,7 @@ export default async function AdminLayout({
                 userName={session.user?.name || 'Admin'}
                 userEmail={session.user?.email || ''}
                 userRole={session.user?.role || 'admin'}
+                appName={appName}
                 onLogout={handleLogout}
             />
 
@@ -34,7 +42,7 @@ export default async function AdminLayout({
             <aside className={styles.sidebar}>
                 <div className={styles.logo}>
                     <Link href="/dashboard">
-                        <span className={styles.logoAccent}>App</span>Imóvel
+                        <span className={styles.logoAccent}>{appName.substring(0, 3)}</span>{appName.substring(3)}
                     </Link>
                 </div>
 

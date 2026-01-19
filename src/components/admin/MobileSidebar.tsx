@@ -9,10 +9,11 @@ interface MobileSidebarProps {
     userName: string;
     userEmail: string;
     userRole: string;
+    appName: string;
     onLogout: () => void;
 }
 
-export default function MobileSidebar({ userName, userEmail, userRole, onLogout }: MobileSidebarProps) {
+export default function MobileSidebar({ userName, userEmail, userRole, appName, onLogout }: MobileSidebarProps) {
     const [isOpen, setIsOpen] = useState(false);
     const pathname = usePathname();
 
@@ -57,7 +58,7 @@ export default function MobileSidebar({ userName, userEmail, userRole, onLogout 
                     </button>
                     <div className={styles.logo}>
                         <Link href="/dashboard" onClick={() => setIsOpen(false)}>
-                            <span className={styles.logoAccent}>App</span>Imóvel
+                            <span className={styles.logoAccent}>{appName.substring(0, 3)}</span>{appName.substring(3)}
                         </Link>
                     </div>
                 </div>

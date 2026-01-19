@@ -18,10 +18,38 @@ model User {
   role       String     @default("admin") // master, admin
   active     Boolean    @default(true)
   properties Property[]
+  settings   UserSettings?
   createdAt  DateTime   @default(now())
   updatedAt  DateTime   @updatedAt
 }
 
+// Global app settings (only master can edit)
+model GlobalSettings {
+  id       String @id @default(cuid())
+  appName  String @default("AppImóvel")
+  appLogo  String?
+}
+
+// Per-user settings (each user has their own)
+model UserSettings {
+  id             String  @id @default(cuid())
+  primaryColor   String  @default("#1a1a2e")
+  secondaryColor String  @default("#e94560")
+  accentColor    String  @default("#f5a623")
+  logoUrl        String?
+  companyName    String  @default("Minha Imobiliária")
+  aboutTitle     String  @default("Sobre Nós")
+  aboutText      String  @default("Somos uma imobiliária especializada em imóveis de alto padrão.")
+  whatsappNumber String?
+  email          String?
+  address        String?
+  user           User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId         String  @unique
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+// Keep old Settings for migration compatibility
 model Settings {
   id             String  @id @default(cuid())
   primaryColor   String  @default("#1a1a2e")

@@ -9,12 +9,39 @@ interface Props {
     params: Promise<{ id: string }>;
 }
 
-async function getSettings() {
-    let settings = await prisma.settings.findFirst();
-    if (!settings) {
-        settings = await prisma.settings.create({ data: {} });
+// Get property owner's settings
+async function getOwnerSettings(userId: string | null) {
+    if (!userId) {
+        // Fallback to default settings
+        return {
+            primaryColor: '#1a1a2e',
+            secondaryColor: '#e94560',
+            accentColor: '#f5a623',
+            companyName: 'Imobiliária',
+            logoUrl: null,
+            whatsappNumber: null,
+            email: null,
+        };
     }
-    return settings;
+
+    const userSettings = await prisma.userSettings.findUnique({
+        where: { userId }
+    });
+
+    if (userSettings) {
+        return userSettings;
+    }
+
+    // Return defaults if no user settings
+    return {
+        primaryColor: '#1a1a2e',
+        secondaryColor: '#e94560',
+        accentColor: '#f5a623',
+        companyName: 'Imobiliária',
+        logoUrl: null,
+        whatsappNumber: null,
+        email: null,
+    };
 }
 
 export default async function PublicPropertyPage({ params }: Props) {
@@ -29,7 +56,8 @@ export default async function PublicPropertyPage({ params }: Props) {
         notFound();
     }
 
-    const settings = await getSettings();
+    // Get the property owner's settings
+    const settings = await getOwnerSettings(property.userId);
 
     // Generate share URLs
     const propertyUrl = `${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/imovel/${property.shareCode}`;
