@@ -37,22 +37,6 @@ interface PdfExportButtonProps {
     variant?: 'default' | 'small';
 }
 
-// Convert image URL to base64
-async function imageToBase64(url: string): Promise<string> {
-    try {
-        const response = await fetch(url);
-        const blob = await response.blob();
-        return new Promise((resolve) => {
-            const reader = new FileReader();
-            reader.onloadend = () => resolve(reader.result as string);
-            reader.onerror = () => resolve(url);
-            reader.readAsDataURL(blob);
-        });
-    } catch {
-        return url;
-    }
-}
-
 export default function PdfExportButton({ property, settings, variant = 'default' }: PdfExportButtonProps) {
     const [generating, setGenerating] = useState(false);
 
@@ -70,37 +54,26 @@ export default function PdfExportButton({ property, settings, variant = 'default
             const { default: jsPDF } = await import('jspdf');
             const { default: html2canvas } = await import('html2canvas');
 
-            // Convert all images to base64 first
-            const mainPhotoBase64 = property.photos[0]?.url
-                ? await imageToBase64(property.photos[0].url)
-                : '';
-
-            const allPhotosBase64 = await Promise.all(
-                property.photos.map(p => imageToBase64(p.url))
-            );
-
-            const logoBase64 = settings.logoUrl
-                ? await imageToBase64(settings.logoUrl)
-                : null;
-
             const container = document.createElement('div');
             container.style.cssText = `
                 position: absolute;
                 left: -9999px;
                 top: 0;
-                width: 800px;
+                width: 794px;
                 background: white;
                 font-family: Arial, sans-serif;
             `;
 
-            // Create photo grid HTML for all photos (3 per row)
-            const photoGridHtml = allPhotosBase64.length > 1 ? `
-                <div style="margin-top: 20px;">
-                    <h3 style="margin: 0 0 15px 0; color: ${settings.primaryColor}; font-size: 14px;">📸 Galeria de Fotos (${allPhotosBase64.length})</h3>
-                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;">
-                        ${allPhotosBase64.map(url => `
-                            <div style="border-radius: 8px; overflow: hidden;">
-                                <img src="${url}" alt="Foto" style="width: 100%; height: 150px; object-fit: cover;" />
+            const mainPhoto = property.photos[0]?.url || '';
+            const allPhotos = property.photos.slice(1);
+
+            const photoGridHtml = allPhotos.length > 0 ? `
+                <div style="margin-top: 25px;">
+                    <h3 style="margin: 0 0 15px 0; color: ${settings.primaryColor}; font-size: 16px; border-bottom: 2px solid ${settings.primaryColor}; padding-bottom: 8px;">📸 Mais Fotos (${allPhotos.length})</h3>
+                    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px;">
+                        ${allPhotos.map(p => `
+                            <div style="border-radius: 8px; overflow: hidden; background: #f0f0f0;">
+                                <img src="${p.url}" alt="Foto" style="width: 100%; height: 200px; object-fit: cover; display: block;" />
                             </div>
                         `).join('')}
                     </div>
@@ -108,71 +81,64 @@ export default function PdfExportButton({ property, settings, variant = 'default
             ` : '';
 
             container.innerHTML = `
-                <div style="padding: 40px; background: white;">
-                    <!-- Header -->
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; padding-bottom: 15px; border-bottom: 3px solid ${settings.primaryColor};">
+                <div style="padding: 30px; background: white;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 3px solid ${settings.primaryColor};">
                         <div>
-                            ${logoBase64
-                    ? `<img src="${logoBase64}" alt="Logo" style="max-height: 50px; max-width: 180px;" />`
+                            ${settings.logoUrl
+                    ? `<img src="${settings.logoUrl}" alt="Logo" style="max-height: 50px; max-width: 180px;" />`
                     : `<h1 style="margin: 0; color: ${settings.primaryColor}; font-size: 24px;">${settings.companyName}</h1>`
                 }
                         </div>
-                        <div style="text-align: right; color: #666; font-size: 11px;">
+                        <div style="text-align: right; color: #666; font-size: 12px;">
                             ${settings.whatsappNumber ? `📱 ${settings.whatsappNumber}<br>` : ''}
                             ${settings.email || ''}
                         </div>
                     </div>
 
-                    <!-- Main Photo -->
-                    ${mainPhotoBase64 ? `
+                    ${mainPhoto ? `
                         <div style="margin-bottom: 20px; border-radius: 12px; overflow: hidden;">
-                            <img src="${mainPhotoBase64}" alt="${property.title}" style="width: 100%; height: 300px; object-fit: cover;" />
+                            <img src="${mainPhoto}" alt="${property.title}" style="width: 100%; height: 350px; object-fit: cover; display: block;" />
                         </div>
                     ` : ''}
 
-                    <!-- Title and Price -->
                     <div style="margin-bottom: 20px;">
-                        <h2 style="margin: 0 0 8px 0; color: ${settings.primaryColor}; font-size: 22px;">${property.title}</h2>
-                        <p style="margin: 0 0 8px 0; color: #666; font-size: 13px;">📍 ${property.address}, ${property.neighborhood} - ${property.city}/${property.state}</p>
-                        <p style="margin: 0; color: #e94560; font-size: 26px; font-weight: bold;">${formatCurrency(property.price)}</p>
-                        ${property.condoFee ? `<p style="margin: 5px 0 0 0; color: #666; font-size: 11px;">Condomínio: ${formatCurrency(property.condoFee)}/mês</p>` : ''}
+                        <h2 style="margin: 0 0 8px 0; color: ${settings.primaryColor}; font-size: 24px;">${property.title}</h2>
+                        <p style="margin: 0 0 10px 0; color: #666; font-size: 14px;">📍 ${property.address}, ${property.neighborhood} - ${property.city}/${property.state}</p>
+                        <p style="margin: 0; color: #e94560; font-size: 28px; font-weight: bold;">${formatCurrency(property.price)}</p>
+                        ${property.condoFee ? `<p style="margin: 5px 0 0 0; color: #666; font-size: 12px;">Condomínio: ${formatCurrency(property.condoFee)}/mês</p>` : ''}
                     </div>
 
-                    <!-- Features Grid -->
-                    <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 20px; padding: 15px; background: #f8f9fa; border-radius: 12px;">
+                    <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 25px; padding: 20px; background: #f8f9fa; border-radius: 12px;">
                         <div style="text-align: center;">
-                            <div style="font-size: 20px;">📐</div>
-                            <div style="font-size: 16px; font-weight: bold; color: ${settings.primaryColor};">${property.totalArea}m²</div>
-                            <div style="font-size: 10px; color: #666;">Área Total</div>
+                            <div style="font-size: 24px;">📐</div>
+                            <div style="font-size: 18px; font-weight: bold; color: ${settings.primaryColor};">${property.totalArea}m²</div>
+                            <div style="font-size: 11px; color: #666;">Área Total</div>
                         </div>
                         <div style="text-align: center;">
-                            <div style="font-size: 20px;">🛏️</div>
-                            <div style="font-size: 16px; font-weight: bold; color: ${settings.primaryColor};">${property.bedrooms}</div>
-                            <div style="font-size: 10px; color: #666;">Quartos</div>
+                            <div style="font-size: 24px;">🛏️</div>
+                            <div style="font-size: 18px; font-weight: bold; color: ${settings.primaryColor};">${property.bedrooms}</div>
+                            <div style="font-size: 11px; color: #666;">Quartos</div>
                         </div>
                         <div style="text-align: center;">
-                            <div style="font-size: 20px;">🚿</div>
-                            <div style="font-size: 16px; font-weight: bold; color: ${settings.primaryColor};">${property.bathrooms}</div>
-                            <div style="font-size: 10px; color: #666;">Banheiros</div>
+                            <div style="font-size: 24px;">🚿</div>
+                            <div style="font-size: 18px; font-weight: bold; color: ${settings.primaryColor};">${property.bathrooms}</div>
+                            <div style="font-size: 11px; color: #666;">Banheiros</div>
                         </div>
                         <div style="text-align: center;">
-                            <div style="font-size: 20px;">🚗</div>
-                            <div style="font-size: 16px; font-weight: bold; color: ${settings.primaryColor};">${property.parkingSpaces}</div>
-                            <div style="font-size: 10px; color: #666;">Vagas</div>
+                            <div style="font-size: 24px;">🚗</div>
+                            <div style="font-size: 18px; font-weight: bold; color: ${settings.primaryColor};">${property.parkingSpaces}</div>
+                            <div style="font-size: 11px; color: #666;">Vagas</div>
                         </div>
                     </div>
 
-                    <!-- Description -->
                     <div style="margin-bottom: 20px;">
-                        <h3 style="margin: 0 0 10px 0; color: ${settings.primaryColor}; font-size: 14px;">Descrição</h3>
-                        <p style="margin: 0; color: #444; font-size: 12px; line-height: 1.5; white-space: pre-wrap;">${property.characteristics}</p>
+                        <h3 style="margin: 0 0 10px 0; color: ${settings.primaryColor}; font-size: 16px;">Descrição</h3>
+                        <p style="margin: 0; color: #444; font-size: 13px; line-height: 1.6; white-space: pre-wrap;">${property.characteristics}</p>
                     </div>
 
-                    <!-- All Photos Grid -->
                     ${photoGridHtml}
 
-                    <!-- Footer -->
-                    <div style="margin-top: 25px; padding-top: 15px; border-top: 1px solid #ddd; text-align: center; color: #666; font-size: 10px;">
+                    <div style="margin-top: 30px; padding-top: 15px; border-top: 1px solid #ddd; text-align: center; color: #666; font-size: 11px;">
                         <p style="margin: 0;">Documento gerado por ${settings.companyName}</p>
                         ${settings.whatsappNumber ? `<p style="margin: 5px 0 0 0;">Entre em contato: ${settings.whatsappNumber}</p>` : ''}
                     </div>
@@ -181,78 +147,46 @@ export default function PdfExportButton({ property, settings, variant = 'default
 
             document.body.appendChild(container);
 
-            // Wait for images to load
             const images = container.querySelectorAll('img');
             await Promise.all(Array.from(images).map(img => {
                 return new Promise<void>((resolve) => {
-                    if (img.complete) {
-                        resolve();
-                    } else {
+                    if (img.complete) resolve();
+                    else {
                         img.onload = () => resolve();
                         img.onerror = () => resolve();
                     }
                 });
             }));
 
-            await new Promise(resolve => setTimeout(resolve, 500));
+            await new Promise(resolve => setTimeout(resolve, 300));
 
             const canvas = await html2canvas(container, {
                 scale: 2,
                 useCORS: true,
                 allowTaint: true,
-                logging: false,
                 backgroundColor: '#ffffff',
             });
 
-            const pdf = new jsPDF({
-                orientation: 'portrait',
-                unit: 'mm',
-                format: 'a4',
-            });
-
+            const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
             const pageWidth = 210;
             const pageHeight = 297;
             const imgWidth = pageWidth;
             const imgHeight = (canvas.height * imgWidth) / canvas.width;
 
-            // If content fits on one page
-            if (imgHeight <= pageHeight) {
-                pdf.addImage(canvas.toDataURL('image/jpeg', 0.95), 'JPEG', 0, 0, imgWidth, imgHeight);
-            } else {
-                // Multiple pages needed - slice the canvas
-                const totalPages = Math.ceil(imgHeight / pageHeight);
-                const sourceHeight = canvas.height / totalPages;
+            pdf.addImage(canvas.toDataURL('image/jpeg', 0.9), 'JPEG', 0, 0, imgWidth, imgHeight);
 
-                for (let i = 0; i < totalPages; i++) {
-                    if (i > 0) pdf.addPage();
-
-                    // Create a canvas for this page slice
-                    const pageCanvas = document.createElement('canvas');
-                    pageCanvas.width = canvas.width;
-                    pageCanvas.height = sourceHeight;
-
-                    const ctx = pageCanvas.getContext('2d');
-                    if (ctx) {
-                        ctx.fillStyle = '#ffffff';
-                        ctx.fillRect(0, 0, pageCanvas.width, pageCanvas.height);
-                        ctx.drawImage(
-                            canvas,
-                            0, i * sourceHeight, canvas.width, sourceHeight,
-                            0, 0, pageCanvas.width, pageCanvas.height
-                        );
-                    }
-
-                    pdf.addImage(pageCanvas.toDataURL('image/jpeg', 0.95), 'JPEG', 0, 0, imgWidth, pageHeight);
-                }
+            let y = pageHeight;
+            while (y < imgHeight) {
+                pdf.addPage();
+                pdf.addImage(canvas.toDataURL('image/jpeg', 0.9), 'JPEG', 0, -y, imgWidth, imgHeight);
+                y += pageHeight;
             }
 
-            const filename = `${property.title.replace(/[^a-zA-Z0-9]/g, '_')}.pdf`;
-            pdf.save(filename);
-
+            pdf.save(`${property.title.replace(/[^a-zA-Z0-9]/g, '_')}.pdf`);
             document.body.removeChild(container);
 
         } catch (error) {
-            console.error('PDF generation error:', error);
+            console.error('PDF error:', error);
             alert('Erro ao gerar PDF. Tente novamente.');
         } finally {
             setGenerating(false);
