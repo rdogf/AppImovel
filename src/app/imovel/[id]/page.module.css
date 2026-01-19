@@ -235,6 +235,13 @@
     flex-wrap: wrap;
 }
 
+.actionButtons {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-lg);
+    align-items: center;
+}
+
 .shareBtn {
     display: inline-flex;
     align-items: center;

@@ -3,6 +3,7 @@ import prisma from '@/lib/prisma';
 import { formatCurrency, formatArea, getPropertyTypeLabel } from '@/lib/utils';
 import ShareButtons from '@/components/public/ShareButtons';
 import ImageGallery from '@/components/public/ImageGallery';
+import PdfExportButton from '@/components/public/PdfExportButton';
 import styles from './page.module.css';
 
 interface Props {
@@ -167,11 +168,41 @@ export default async function PublicPropertyPage({ params }: Props) {
                 <section className={styles.shareSection} style={{ '--secondary': settings.secondaryColor } as React.CSSProperties}>
                     <h2 className={styles.sectionTitle}>Compartilhar</h2>
                     <p className={styles.shareText}>Gostou deste imóvel? Compartilhe com amigos e familiares!</p>
-                    <ShareButtons
-                        propertyUrl={propertyUrl}
-                        shareMessage={shareMessage}
-                        whatsappNumber={settings.whatsappNumber}
-                    />
+                    <div className={styles.actionButtons}>
+                        <ShareButtons
+                            propertyUrl={propertyUrl}
+                            shareMessage={shareMessage}
+                            whatsappNumber={settings.whatsappNumber}
+                        />
+                        <PdfExportButton
+                            property={{
+                                title: property.title,
+                                address: property.address,
+                                neighborhood: property.neighborhood,
+                                city: property.city,
+                                state: property.state,
+                                totalArea: property.totalArea,
+                                propertyType: property.propertyType,
+                                bedrooms: property.bedrooms,
+                                suites: property.suites,
+                                bathrooms: property.bathrooms,
+                                parkingSpaces: property.parkingSpaces,
+                                characteristics: property.characteristics,
+                                price: property.price,
+                                condoFee: property.condoFee,
+                                iptu: property.iptu,
+                                status: property.status,
+                                photos: property.photos.map(p => ({ url: p.url })),
+                            }}
+                            settings={{
+                                companyName: settings.companyName,
+                                logoUrl: settings.logoUrl,
+                                primaryColor: settings.primaryColor,
+                                whatsappNumber: settings.whatsappNumber,
+                                email: settings.email,
+                            }}
+                        />
+                    </div>
                 </section>
 
                 {/* About Section */}
