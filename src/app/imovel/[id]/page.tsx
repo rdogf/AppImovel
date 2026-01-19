@@ -11,17 +11,21 @@ interface Props {
 
 // Get property owner's settings
 async function getOwnerSettings(userId: string | null) {
+    const defaultSettings = {
+        primaryColor: '#1a1a2e',
+        secondaryColor: '#e94560',
+        accentColor: '#f5a623',
+        companyName: 'Imobiliária',
+        logoUrl: null,
+        whatsappNumber: null,
+        email: null,
+        aboutTitle: 'Sobre Nós',
+        aboutText: 'Somos uma imobiliária especializada em imóveis de alto padrão.',
+        address: null,
+    };
+
     if (!userId) {
-        // Fallback to default settings
-        return {
-            primaryColor: '#1a1a2e',
-            secondaryColor: '#e94560',
-            accentColor: '#f5a623',
-            companyName: 'Imobiliária',
-            logoUrl: null,
-            whatsappNumber: null,
-            email: null,
-        };
+        return defaultSettings;
     }
 
     const userSettings = await prisma.userSettings.findUnique({
@@ -32,16 +36,7 @@ async function getOwnerSettings(userId: string | null) {
         return userSettings;
     }
 
-    // Return defaults if no user settings
-    return {
-        primaryColor: '#1a1a2e',
-        secondaryColor: '#e94560',
-        accentColor: '#f5a623',
-        companyName: 'Imobiliária',
-        logoUrl: null,
-        whatsappNumber: null,
-        email: null,
-    };
+    return defaultSettings;
 }
 
 export default async function PublicPropertyPage({ params }: Props) {
