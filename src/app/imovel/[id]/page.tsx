@@ -32,7 +32,7 @@ export default async function PublicPropertyPage({ params }: Props) {
     const settings = await getSettings();
 
     // Generate share URLs
-    const propertyUrl = `${process.env.NEXTAUTH_URL || 'http://localhost:3001'}/imovel/${property.shareCode}`;
+    const propertyUrl = `${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/imovel/${property.shareCode}`;
     const shareMessage = `Confira este imóvel: ${property.title} - ${formatCurrency(property.price)} - ${propertyUrl}`;
 
     return (
