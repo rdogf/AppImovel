@@ -51,10 +51,15 @@ export default function MobileSidebar({ userName, userEmail, userRole, onLogout 
 
             {/* Sidebar */}
             <aside className={`${styles.sidebar} ${isOpen ? styles.open : ''}`}>
-                <div className={styles.logo}>
-                    <Link href="/dashboard" onClick={() => setIsOpen(false)}>
-                        <span className={styles.logoAccent}>App</span>Imóvel
-                    </Link>
+                <div className={styles.sidebarHeader}>
+                    <button className={styles.closeBtn} onClick={() => setIsOpen(false)} aria-label="Fechar">
+                        ✕
+                    </button>
+                    <div className={styles.logo}>
+                        <Link href="/dashboard" onClick={() => setIsOpen(false)}>
+                            <span className={styles.logoAccent}>App</span>Imóvel
+                        </Link>
+                    </div>
                 </div>
 
                 <nav className={styles.nav}>
