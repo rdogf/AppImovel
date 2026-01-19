@@ -1,5 +1,6 @@
 import { auth } from '@/lib/auth';
 import { getGlobalSettings, updateGlobalSettings, getUserSettings, updateUserSettings } from './actions';
+import LogoUploader from '@/components/admin/LogoUploader';
 import styles from './page.module.css';
 
 export default async function ConfiguracoesPage() {
@@ -35,17 +36,12 @@ export default async function ConfiguracoesPage() {
                             <small className={styles.hint}>Aparece na sidebar para todos os usuários</small>
                         </div>
 
-                        <div className="form-group">
-                            <label htmlFor="appLogo" className="form-label">Logo do App (URL)</label>
-                            <input
-                                type="url"
-                                id="appLogo"
-                                name="appLogo"
-                                className="form-input"
-                                defaultValue={globalSettings.appLogo ?? ''}
-                                placeholder="https://exemplo.com/logo.png"
-                            />
-                        </div>
+                        <LogoUploader
+                            currentLogo={globalSettings.appLogo}
+                            inputName="appLogo"
+                            label="Logo do App"
+                            recommendedSize="200x50px (PNG transparente)"
+                        />
 
                         <div className={styles.actions}>
                             <button type="submit" className="btn btn-primary">
@@ -75,22 +71,12 @@ export default async function ConfiguracoesPage() {
                         />
                     </div>
 
-                    <div className="form-group">
-                        <label htmlFor="logoUrl" className="form-label">URL do Seu Logo</label>
-                        <input
-                            type="url"
-                            id="logoUrl"
-                            name="logoUrl"
-                            className="form-input"
-                            defaultValue={userSettings?.logoUrl ?? ''}
-                            placeholder="https://exemplo.com/seu-logo.png"
-                        />
-                        {userSettings?.logoUrl && (
-                            <div className={styles.logoPreview}>
-                                <img src={userSettings.logoUrl} alt="Logo" />
-                            </div>
-                        )}
-                    </div>
+                    <LogoUploader
+                        currentLogo={userSettings?.logoUrl || null}
+                        inputName="logoUrl"
+                        label="Seu Logo"
+                        recommendedSize="300x80px (PNG transparente)"
+                    />
 
                     <div className={styles.colorsGrid}>
                         <div className="form-group">
