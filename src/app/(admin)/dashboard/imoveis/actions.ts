@@ -177,5 +177,20 @@ export async function deletePhoto(id: string, propertyId: string) {
         where: { id },
     });
 
+
     revalidatePath(`/dashboard/imoveis/${propertyId}`);
+}
+
+export async function getProperty(id: string) {
+    const session = await auth();
+    if (!session?.user?.id) {
+        throw new Error('Unauthorized');
+    }
+
+    const property = await prisma.property.findUnique({
+        where: { id },
+        include: { photos: { orderBy: { order: 'asc' } } },
+    });
+
+    return property;
 }
