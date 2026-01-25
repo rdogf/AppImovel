@@ -141,7 +141,7 @@ export default function PdfExportButton({ property, settings, variant = 'default
 
             await addPageToPdf(page1Html, true);
 
-            // PHOTO PAGES: 6 photos per page (2x3)
+            // PHOTO PAGES: 6 photos per page (2x3 grid)
             const photosPerPage = 6;
             const photoPages = Math.ceil(otherPhotos.length / photosPerPage);
 
@@ -158,8 +158,8 @@ export default function PdfExportButton({ property, settings, variant = 'default
 
                         <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px;">
                             ${pagePhotos.map(p => `
-                                <div style="border-radius: 10px; overflow: hidden; background: #f0f0f0;">
-                                    <img src="${p.url}" style="width: 100%; height: 165px; object-fit: cover; display: block;" crossorigin="anonymous" />
+                                <div style="border-radius: 8px; overflow: hidden; background: #fff; height: 260px; display: flex; align-items: center; justify-content: center; border: 1px solid #eee;">
+                                    <img src="${p.url}" style="max-width: 100%; max-height: 100%; object-fit: contain; display: block;" crossorigin="anonymous" />
                                 </div>
                             `).join('')}
                         </div>
