@@ -50,6 +50,35 @@ export default function ImageGallery({ photos, propertyTitle }: ImageGalleryProp
         return () => window.removeEventListener('keydown', handleKeyDown);
     }, [isOpen, goNext, goPrev]);
 
+    // Touch Swipe Logic
+    const [touchStart, setTouchStart] = useState<number | null>(null);
+    const [touchEnd, setTouchEnd] = useState<number | null>(null);
+    const minSwipeDistance = 50;
+
+    const onTouchStart = (e: React.TouchEvent) => {
+        setTouchEnd(null);
+        setTouchStart(e.targetTouches[0].clientX);
+    };
+
+    const onTouchMove = (e: React.TouchEvent) => {
+        setTouchEnd(e.targetTouches[0].clientX);
+    };
+
+    const onTouchEnd = () => {
+        if (!touchStart || !touchEnd) return;
+
+        const distance = touchStart - touchEnd;
+        const isLeftSwipe = distance > minSwipeDistance;
+        const isRightSwipe = distance < -minSwipeDistance;
+
+        if (isLeftSwipe) {
+            goNext();
+        }
+        if (isRightSwipe) {
+            goPrev();
+        }
+    };
+
     if (photos.length === 0) return null;
 
     return (
@@ -73,7 +102,13 @@ export default function ImageGallery({ photos, propertyTitle }: ImageGalleryProp
 
             {/* Lightbox */}
             {isOpen && (
-                <div className={styles.lightbox} onClick={closeLightbox}>
+                <div
+                    className={styles.lightbox}
+                    onClick={closeLightbox}
+                    onTouchStart={onTouchStart}
+                    onTouchMove={onTouchMove}
+                    onTouchEnd={onTouchEnd}
+                >
                     <button className={styles.closeBtn} onClick={closeLightbox} aria-label="Fechar">
                         ✕
                     </button>
