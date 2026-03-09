@@ -29,8 +29,16 @@ async function getOwnerSettings(userId: string | null) {
         return defaultSettings;
     }
 
+    // Check if the user is a sub-user and has a parentId
+    const user = await prisma.user.findUnique({
+        where: { id: userId },
+        select: { parentId: true }
+    });
+
+    const targetUserId = user?.parentId || userId;
+
     const userSettings = await prisma.userSettings.findUnique({
-        where: { userId }
+        where: { userId: targetUserId }
     });
 
     if (userSettings) {
@@ -54,6 +62,12 @@ export default async function PublicPropertyPage({ params }: Props) {
 
     // Get the property owner's settings
     const settings = await getOwnerSettings(property.userId);
+
+    // Increment visit count (fire and forget)
+    prisma.property.update({
+        where: { id: property.id },
+        data: { visitCount: { increment: 1 } }
+    }).catch(console.error);
 
     // Generate share URLs
     const propertyUrl = `${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/imovel/${property.shareCode}`;
@@ -176,6 +190,7 @@ export default async function PublicPropertyPage({ params }: Props) {
                         />
                         <PdfExportButton
                             property={{
+                                id: property.id,
                                 title: property.title,
                                 address: property.address,
                                 neighborhood: property.neighborhood,

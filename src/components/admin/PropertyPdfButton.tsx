@@ -184,6 +184,10 @@ export default function PropertyPdfButton({ property, settings }: PropertyPdfBut
             const fileName = property.title.replace(/[^a-zA-Z0-9\s]/g, '').replace(/\s+/g, '_');
             pdf.save(`${fileName}.pdf`);
 
+            // Increment count
+            const { incrementPdfCount } = await import('@/app/(admin)/dashboard/imoveis/actions');
+            await incrementPdfCount(property.id);
+
         } catch (error) {
             console.error('Erro PDF:', error);
             alert('Erro ao gerar PDF. Verifique o console.');

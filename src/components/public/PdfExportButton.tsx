@@ -4,6 +4,7 @@ import { useState } from 'react';
 import styles from './PdfExportButton.module.css';
 
 interface PropertyData {
+    id?: string;
     title: string;
     address: string;
     neighborhood: string;
@@ -175,6 +176,11 @@ export default function PdfExportButton({ property, settings, variant = 'default
 
             const fileName = property.title.replace(/[^a-zA-Z0-9\s]/g, '').replace(/\s+/g, '_');
             pdf.save(`${fileName}.pdf`);
+
+            if (property.id) {
+                const { incrementPdfCount } = await import('@/app/(admin)/dashboard/imoveis/actions');
+                await incrementPdfCount(property.id);
+            }
 
         } catch (error) {
             console.error('Erro PDF:', error);

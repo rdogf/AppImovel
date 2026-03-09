@@ -15,10 +15,15 @@ model User {
   email      String     @unique
   password   String
   name       String
-  role       String     @default("admin") // master, admin
+  role       String     @default("admin") // master, admin, user
   active     Boolean    @default(true)
   properties Property[]
   settings   UserSettings?
+  
+  parentId   String?
+  parent     User?      @relation("UserChildren", fields: [parentId], references: [id], onDelete: SetNull)
+  children   User[]     @relation("UserChildren")
+
   createdAt  DateTime   @default(now())
   updatedAt  DateTime   @updatedAt
 }
@@ -87,6 +92,10 @@ model Property {
   featured        Boolean  @default(false)
   active          Boolean  @default(true)         // Soft delete
   shareCode       String   @unique @default(cuid())
+  
+  visitCount        Int      @default(0)
+  pdfGeneratedCount Int      @default(0)
+
   photos          Photo[]
   user            User?    @relation(fields: [userId], references: [id])
   userId          String?

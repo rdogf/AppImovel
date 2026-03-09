@@ -72,16 +72,18 @@ export default function MobileSidebar({ userName, userEmail, userRole, appName, 
                         <span className={styles.navIcon}>🏠</span>
                         Imóveis
                     </Link>
-                    {userRole === 'master' && (
+                    {userRole !== 'user' && (
                         <Link href="/dashboard/usuarios" className={styles.navItem} onClick={() => setIsOpen(false)}>
                             <span className={styles.navIcon}>👥</span>
                             Usuários
                         </Link>
                     )}
-                    <Link href="/dashboard/configuracoes" className={styles.navItem} onClick={() => setIsOpen(false)}>
-                        <span className={styles.navIcon}>⚙️</span>
-                        Configurações
-                    </Link>
+                    {userRole !== 'user' && (
+                        <Link href="/dashboard/configuracoes" className={styles.navItem} onClick={() => setIsOpen(false)}>
+                            <span className={styles.navIcon}>⚙️</span>
+                            Configurações
+                        </Link>
+                    )}
                 </nav>
 
                 <div className={styles.userSection}>

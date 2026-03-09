@@ -7,16 +7,38 @@ export default async function DashboardPage() {
     const session = await auth();
     const isMaster = session?.user?.role === 'master';
 
-    // Build where clause for user filtering
-    const userFilter = isMaster ? {} : { userId: session?.user?.id };
+    const userRole = session?.user?.role;
+    const userId = session?.user?.id;
+    let userFilter: any = {};
+
+    if (userRole === 'admin') {
+        userFilter = {
+            OR: [
+                { userId },
+                { user: { parentId: userId } }
+            ]
+        };
+    } else if (userRole === 'user') {
+        userFilter = { userId };
+    }
 
     // Get statistics (filtered by user for non-master)
-    const [totalProperties, availableProperties, soldProperties, reservedProperties] = await Promise.all([
+    const [statsAgg, totalProperties, availableProperties, soldProperties, reservedProperties] = await Promise.all([
+        prisma.property.aggregate({
+            _sum: {
+                visitCount: true,
+                pdfGeneratedCount: true
+            },
+            where: { active: true, ...userFilter }
+        }),
         prisma.property.count({ where: { active: true, ...userFilter } }),
         prisma.property.count({ where: { status: 'disponivel', active: true, ...userFilter } }),
         prisma.property.count({ where: { status: 'vendido', active: true, ...userFilter } }),
         prisma.property.count({ where: { status: 'reservado', active: true, ...userFilter } }),
     ]);
+
+    const totalVisits = statsAgg._sum.visitCount || 0;
+    const totalPdfs = statsAgg._sum.pdfGeneratedCount || 0;
 
     // Get recent properties (filtered by user for non-master)
     const recentProperties = await prisma.property.findMany({
@@ -43,6 +65,20 @@ export default async function DashboardPage() {
                     <div className={styles.statContent}>
                         <span className={styles.statValue}>{totalProperties}</span>
                         <span className={styles.statLabel}>Total de Imóveis</span>
+                    </div>
+                </div>
+                <div className={styles.statCard}>
+                    <div className={styles.statIcon} style={{ background: 'rgba(23, 162, 184, 0.15)' }}>👁️</div>
+                    <div className={styles.statContent}>
+                        <span className={styles.statValue} style={{ color: '#17a2b8' }}>{totalVisits}</span>
+                        <span className={styles.statLabel}>Visualizações</span>
+                    </div>
+                </div>
+                <div className={styles.statCard}>
+                    <div className={styles.statIcon} style={{ background: 'rgba(108, 117, 125, 0.15)' }}>📄</div>
+                    <div className={styles.statContent}>
+                        <span className={styles.statValue} style={{ color: '#6c757d' }}>{totalPdfs}</span>
+                        <span className={styles.statLabel}>PDFs Gerados</span>
                     </div>
                 </div>
                 <div className={styles.statCard}>

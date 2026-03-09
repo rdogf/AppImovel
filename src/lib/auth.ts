@@ -6,6 +6,7 @@ import prisma from './prisma';
 declare module 'next-auth' {
     interface User {
         role?: string;
+        parentId?: string | null;
     }
     interface Session {
         user: {
@@ -13,6 +14,7 @@ declare module 'next-auth' {
             email: string;
             name: string;
             role: string;
+            parentId?: string | null;
         };
     }
 }
@@ -21,6 +23,7 @@ declare module '@auth/core/jwt' {
     interface JWT {
         id: string;
         role: string;
+        parentId?: string | null;
     }
 }
 
@@ -59,6 +62,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
                     email: user.email,
                     name: user.name,
                     role: user.role,
+                    parentId: user.parentId,
                 };
             },
         }),
@@ -71,6 +75,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             if (user) {
                 token.id = user.id as string;
                 token.role = user.role as string;
+                token.parentId = user.parentId;
             }
             return token;
         },
@@ -78,6 +83,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             if (session.user) {
                 session.user.id = token.id;
                 session.user.role = token.role;
+                session.user.parentId = token.parentId;
             }
             return session;
         },

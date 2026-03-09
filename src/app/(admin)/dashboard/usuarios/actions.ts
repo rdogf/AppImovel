@@ -8,7 +8,7 @@ import bcrypt from 'bcryptjs';
 
 export async function createUser(formData: FormData) {
     const session = await auth();
-    if (session?.user?.role !== 'master') {
+    if (session?.user?.role === 'user' || !session?.user?.role) {
         throw new Error('Unauthorized');
     }
 
@@ -18,13 +18,17 @@ export async function createUser(formData: FormData) {
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
+    const role = session.user.role === 'master' ? 'admin' : 'user';
+    const parentId = session.user.role === 'master' ? null : session.user.id;
+
     await prisma.user.create({
         data: {
             name,
             email,
             password: hashedPassword,
-            role: 'admin',
-        },
+            role,
+            parentId,
+        } as any,
     });
 
     revalidatePath('/dashboard/usuarios');
@@ -33,7 +37,14 @@ export async function createUser(formData: FormData) {
 
 export async function updateUser(id: string, formData: FormData) {
     const session = await auth();
-    if (session?.user?.role !== 'master') {
+    if (session?.user?.role === 'user' || !session?.user?.role) {
+        throw new Error('Unauthorized');
+    }
+
+    const targetUser = await prisma.user.findUnique({ where: { id } });
+    if (!targetUser) throw new Error('User not found');
+
+    if (session.user.role !== 'master' && targetUser.parentId !== session.user.id) {
         throw new Error('Unauthorized');
     }
 
@@ -60,7 +71,7 @@ export async function updateUser(id: string, formData: FormData) {
 
 export async function toggleUserActive(id: string) {
     const session = await auth();
-    if (session?.user?.role !== 'master') {
+    if (session?.user?.role === 'user' || !session?.user?.role) {
         throw new Error('Unauthorized');
     }
 
@@ -72,6 +83,10 @@ export async function toggleUserActive(id: string) {
     const user = await prisma.user.findUnique({ where: { id } });
     if (!user) {
         throw new Error('User not found');
+    }
+
+    if (session.user.role !== 'master' && user.parentId !== session.user.id) {
+        throw new Error('Unauthorized');
     }
 
     await prisma.user.update({

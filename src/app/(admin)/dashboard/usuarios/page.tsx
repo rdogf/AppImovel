@@ -7,12 +7,15 @@ import styles from './page.module.css';
 export default async function UsuariosPage() {
     const session = await auth();
 
-    // Only master can manage users
-    if (session?.user?.role !== 'master') {
+    // Only master and admin can manage users
+    if (session?.user?.role === 'user' || !session?.user?.role) {
         redirect('/dashboard');
     }
 
+    const whereClause: any = session.user.role === 'master' ? {} : { parentId: session.user.id };
+
     const users = await prisma.user.findMany({
+        where: whereClause,
         orderBy: { createdAt: 'desc' },
         include: {
             _count: { select: { properties: true } },
@@ -64,8 +67,8 @@ export default async function UsuariosPage() {
                                 <h3>{user.name}</h3>
                                 <p>{user.email}</p>
                                 <div className={styles.badges}>
-                                    <span className={`badge ${user.role === 'master' ? 'status-disponivel' : 'status-reservado'}`}>
-                                        {user.role === 'master' ? 'Master' : 'Admin'}
+                                    <span className={`badge ${user.role === 'master' ? 'status-disponivel' : user.role === 'admin' ? 'status-reservado' : 'status-alugado'}`}>
+                                        {user.role === 'master' ? 'Master' : user.role === 'admin' ? 'Admin' : 'Usuário'}
                                     </span>
                                     {!user.active && (
                                         <span className="badge" style={{ background: '#6c757d' }}>Inativo</span>

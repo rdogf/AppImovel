@@ -55,16 +55,18 @@ export default async function AdminLayout({
                         <span className={styles.navIcon}>🏠</span>
                         Imóveis
                     </Link>
-                    {session.user?.role === 'master' && (
+                    {session.user?.role !== 'user' && (
                         <Link href="/dashboard/usuarios" className={styles.navItem}>
                             <span className={styles.navIcon}>👥</span>
                             Usuários
                         </Link>
                     )}
-                    <Link href="/dashboard/configuracoes" className={styles.navItem}>
-                        <span className={styles.navIcon}>⚙️</span>
-                        Configurações
-                    </Link>
+                    {session.user?.role !== 'user' && (
+                        <Link href="/dashboard/configuracoes" className={styles.navItem}>
+                            <span className={styles.navIcon}>⚙️</span>
+                            Configurações
+                        </Link>
+                    )}
                 </nav>
 
                 <div className={styles.userSection}>

@@ -29,20 +29,22 @@ export default async function EditarImovelPage({ params }: Props) {
 
     const property = await prisma.property.findUnique({
         where: { id },
-        include: { photos: { orderBy: { order: 'asc' } } },
+        include: {
+            photos: { orderBy: { order: 'asc' } },
+            user: true,
+        },
     });
 
     if (!property) {
         notFound();
     }
 
-    // Only owner can edit - master can only deactivate via list page
     const isOwner = property.userId === session?.user?.id;
-    if (!isOwner && session?.user?.role !== 'admin') {
-        // Master trying to edit someone else's property - redirect
-        if (session?.user?.role === 'master' && property.userId !== session?.user?.id) {
-            redirect('/dashboard/imoveis');
-        }
+    const isMaster = session?.user?.role === 'master';
+    const isParentAdmin = session?.user?.role === 'admin' && property.user?.parentId === session?.user?.id;
+
+    if (!isMaster && !isOwner && !isParentAdmin) {
+        redirect('/dashboard/imoveis');
     }
 
     const updatePropertyWithId = updateProperty.bind(null, id);

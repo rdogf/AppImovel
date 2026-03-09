@@ -19,7 +19,21 @@ export default async function ImoveisPage({ searchParams }: Props) {
     const currentSearch = params.busca || '';
 
     // Build base filter for user
-    const userFilter = session?.user?.role === 'master' ? {} : { userId: session?.user?.id };
+    const userRole = session?.user?.role;
+    const userId = session?.user?.id;
+
+    let userFilter: any = {};
+    if (userRole === 'admin') {
+        userFilter = {
+            OR: [
+                { userId },
+                { user: { parentId: userId } }
+            ]
+        };
+    } else if (userRole === 'user') {
+        userFilter = { userId };
+    }
+
     const baseFilter = { active: true, ...userFilter };
 
     // Build search filter
@@ -57,8 +71,9 @@ export default async function ImoveisPage({ searchParams }: Props) {
     });
 
     // Get user settings for PDF generation
-    const userSettings = session?.user?.id ? await prisma.userSettings.findUnique({
-        where: { userId: session.user.id }
+    const userIdForSettings = session?.user?.role === 'user' ? (session?.user?.parentId || session?.user?.id) : session?.user?.id;
+    const userSettings = userIdForSettings ? await prisma.userSettings.findUnique({
+        where: { userId: userIdForSettings }
     }) : null;
 
     const pdfSettings = {
@@ -162,7 +177,7 @@ export default async function ImoveisPage({ searchParams }: Props) {
                                 <p className={styles.cardAddress}>
                                     {property.neighborhood}, {property.city}
                                 </p>
-                                {isMaster && property.user && (
+                                {(userRole === 'master' || userRole === 'admin') && property.user && (
                                     <p className={styles.cardOwner}>👤 {property.user.name}</p>
                                 )}
 
@@ -178,15 +193,13 @@ export default async function ImoveisPage({ searchParams }: Props) {
                             </div>
 
                             <div className={styles.cardActions}>
-                                {/* Can edit only own properties */}
-                                {(property.userId === session?.user?.id || !isMaster) ? (
-                                    <Link
-                                        href={`/dashboard/imoveis/${property.id}`}
-                                        className="btn btn-outline btn-sm"
-                                    >
-                                        Editar
-                                    </Link>
-                                ) : (
+                                <Link
+                                    href={`/dashboard/imoveis/${property.id}`}
+                                    className="btn btn-outline btn-sm"
+                                >
+                                    Editar
+                                </Link>
+                                {isMaster && property.userId !== session?.user?.id && (
                                     <form action={async () => {
                                         'use server';
                                         const { deleteProperty } = await import('./actions');

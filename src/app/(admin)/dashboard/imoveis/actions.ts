@@ -47,11 +47,19 @@ export async function updateProperty(id: string, formData: FormData) {
     }
 
     // Verify ownership
-    const property = await prisma.property.findUnique({ where: { id } });
+    const property = await prisma.property.findUnique({
+        where: { id },
+        include: { user: true }
+    });
     if (!property) {
         throw new Error('Property not found');
     }
-    if (session.user.role !== 'master' && property.userId !== session.user.id) {
+
+    const isOwner = property.userId === session.user.id;
+    const isMaster = session.user.role === 'master';
+    const isParentAdmin = session.user.role === 'admin' && property.user?.parentId === session.user.id;
+
+    if (!isMaster && !isOwner && !isParentAdmin) {
         throw new Error('Unauthorized');
     }
 
@@ -93,11 +101,19 @@ export async function deleteProperty(id: string) {
     }
 
     // Verify ownership
-    const property = await prisma.property.findUnique({ where: { id } });
+    const property = await prisma.property.findUnique({
+        where: { id },
+        include: { user: true }
+    });
     if (!property) {
         throw new Error('Property not found');
     }
-    if (session.user.role !== 'master' && property.userId !== session.user.id) {
+
+    const isOwner = property.userId === session.user.id;
+    const isMaster = session.user.role === 'master';
+    const isParentAdmin = session.user.role === 'admin' && property.user?.parentId === session.user.id;
+
+    if (!isMaster && !isOwner && !isParentAdmin) {
         throw new Error('Unauthorized');
     }
 
@@ -118,11 +134,19 @@ export async function restoreProperty(id: string) {
     }
 
     // Verify ownership
-    const property = await prisma.property.findUnique({ where: { id } });
+    const property = await prisma.property.findUnique({
+        where: { id },
+        include: { user: true }
+    });
     if (!property) {
         throw new Error('Property not found');
     }
-    if (session.user.role !== 'master' && property.userId !== session.user.id) {
+
+    const isOwner = property.userId === session.user.id;
+    const isMaster = session.user.role === 'master';
+    const isParentAdmin = session.user.role === 'admin' && property.user?.parentId === session.user.id;
+
+    if (!isMaster && !isOwner && !isParentAdmin) {
         throw new Error('Unauthorized');
     }
 
@@ -193,4 +217,15 @@ export async function getProperty(id: string) {
     });
 
     return property;
+}
+
+export async function incrementPdfCount(id: string) {
+    try {
+        await prisma.property.update({
+            where: { id },
+            data: { pdfGeneratedCount: { increment: 1 } },
+        });
+    } catch (error) {
+        console.error('Failed to increment PDF count:', error);
+    }
 }
