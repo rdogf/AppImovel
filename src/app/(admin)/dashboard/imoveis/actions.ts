@@ -4,6 +4,25 @@ import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import prisma from '@/lib/prisma';
 import { auth } from '@/lib/auth';
+import { canEditProperty } from '@/lib/permissions';
+
+async function recordHistory(propertyId: string, action: 'create' | 'update') {
+    const session = await auth();
+    if (!session?.user?.id) return;
+    try {
+        await prisma.propertyHistory.create({
+            data: {
+                propertyId,
+                action,
+                userId: session.user.id,
+                userName: session.user.name || session.user.email || 'Usuário',
+                userRole: session.user.role,
+            },
+        });
+    } catch (error) {
+        console.error('Failed to record property history:', error);
+    }
+}
 
 export async function createProperty(formData: FormData) {
     const session = await auth();
@@ -27,14 +46,18 @@ export async function createProperty(formData: FormData) {
         price: parseFloat(formData.get('price') as string) || 0,
         condoFee: parseFloat(formData.get('condoFee') as string) || null,
         iptu: parseFloat(formData.get('iptu') as string) || null,
+        outstandingBalance: parseFloat(formData.get('outstandingBalance') as string) || null,
+        unitNumber: (formData.get('unitNumber') as string)?.trim() || null,
         status: formData.get('status') as string || 'disponivel',
         featured: formData.get('featured') === 'on',
         userId: session.user.id,
     };
 
-    await prisma.property.create({
+    const created = await prisma.property.create({
         data,
     });
+
+    await recordHistory(created.id, 'create');
 
     revalidatePath('/dashboard/imoveis');
     redirect('/dashboard/imoveis');
@@ -55,11 +78,7 @@ export async function updateProperty(id: string, formData: FormData) {
         throw new Error('Property not found');
     }
 
-    const isOwner = property.userId === session.user.id;
-    const isMaster = session.user.role === 'master';
-    const isParentAdmin = session.user.role === 'admin' && property.user?.parentId === session.user.id;
-
-    if (!isMaster && !isOwner && !isParentAdmin) {
+    if (!canEditProperty(session.user, property)) {
         throw new Error('Unauthorized');
     }
 
@@ -79,6 +98,8 @@ export async function updateProperty(id: string, formData: FormData) {
         price: parseFloat(formData.get('price') as string) || 0,
         condoFee: parseFloat(formData.get('condoFee') as string) || null,
         iptu: parseFloat(formData.get('iptu') as string) || null,
+        outstandingBalance: parseFloat(formData.get('outstandingBalance') as string) || null,
+        unitNumber: (formData.get('unitNumber') as string)?.trim() || null,
         status: formData.get('status') as string || 'disponivel',
         featured: formData.get('featured') === 'on',
     };
@@ -87,6 +108,8 @@ export async function updateProperty(id: string, formData: FormData) {
         where: { id },
         data,
     });
+
+    await recordHistory(id, 'update');
 
     revalidatePath('/dashboard/imoveis');
     revalidatePath(`/dashboard/imoveis/${id}`);

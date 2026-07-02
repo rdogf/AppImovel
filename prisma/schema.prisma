@@ -88,6 +88,8 @@ model Property {
   price           Float
   condoFee        Float?
   iptu            Float?
+  outstandingBalance Float?               // Saldo devedor (visível a todos)
+  unitNumber      String?                 // Número da unidade (interno: staff apenas)
   status          String   @default("disponivel") // disponivel, vendido, reservado, alugado
   featured        Boolean  @default(false)
   active          Boolean  @default(true)         // Soft delete
@@ -97,10 +99,25 @@ model Property {
   pdfGeneratedCount Int      @default(0)
 
   photos          Photo[]
+  history         PropertyHistory[]
   user            User?    @relation(fields: [userId], references: [id])
   userId          String?
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
+}
+
+// Edit history of a property (visible only to staff: master, admin, coordenadores)
+model PropertyHistory {
+  id         String   @id @default(cuid())
+  action     String   @default("update") // create, update
+  userId     String?                       // quem alterou (pode ficar null se usuário for removido)
+  userName   String                        // snapshot do nome de quem alterou
+  userRole   String?                       // master, admin, user
+  property   Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  propertyId String
+  createdAt  DateTime @default(now())
+
+  @@index([propertyId])
 }
 
 model Photo {

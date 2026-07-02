@@ -20,6 +20,7 @@ interface PropertyData {
     price: number;
     condoFee: number | null;
     iptu: number | null;
+    outstandingBalance: number | null;
     status: string;
     photos: { url: string }[];
 }
@@ -28,6 +29,8 @@ interface SettingsData {
     companyName: string;
     logoUrl: string | null;
     primaryColor: string;
+    secondaryColor: string;
+    accentColor: string;
     whatsappNumber: string | null;
     email: string | null;
 }
@@ -118,15 +121,17 @@ export default function PdfExportButton({ property, settings, variant = 'default
                     <div style="margin-bottom: 20px;">
                         <h2 style="margin: 0 0 8px 0; color: ${settings.primaryColor}; font-size: 24px;">${property.title}</h2>
                         <p style="margin: 0 0 10px 0; color: #666; font-size: 14px;">📍 ${property.address}, ${property.neighborhood} - ${property.city}/${property.state}</p>
-                        <p style="margin: 0; color: #e94560; font-size: 28px; font-weight: bold;">${formatCurrency(property.price)}</p>
+                        <p style="margin: 0; color: ${settings.accentColor}; font-size: 28px; font-weight: bold;">${formatCurrency(property.price)}</p>
                         ${property.condoFee ? `<p style="margin: 5px 0 0 0; color: #666; font-size: 12px;">Condomínio: ${formatCurrency(property.condoFee)}/mês</p>` : ''}
+                        ${property.iptu ? `<p style="margin: 3px 0 0 0; color: #666; font-size: 12px;">IPTU: ${formatCurrency(property.iptu)}/ano</p>` : ''}
+                        ${property.outstandingBalance != null ? `<p style="margin: 3px 0 0 0; color: #666; font-size: 12px;">Saldo devedor: ${formatCurrency(property.outstandingBalance)}</p>` : ''}
                     </div>
 
                     <div style="display: flex; justify-content: space-around; margin-bottom: 25px; padding: 20px; background: #f5f5f5; border-radius: 10px;">
-                        <div style="text-align: center;"><div style="font-size: 24px;">📐</div><div style="font-size: 18px; font-weight: bold;">${property.totalArea}m²</div><div style="font-size: 11px; color: #666;">Área Total</div></div>
-                        <div style="text-align: center;"><div style="font-size: 24px;">🛏️</div><div style="font-size: 18px; font-weight: bold;">${property.bedrooms}</div><div style="font-size: 11px; color: #666;">Quartos</div></div>
-                        <div style="text-align: center;"><div style="font-size: 24px;">🚿</div><div style="font-size: 18px; font-weight: bold;">${property.bathrooms}</div><div style="font-size: 11px; color: #666;">Banheiros</div></div>
-                        <div style="text-align: center;"><div style="font-size: 24px;">🚗</div><div style="font-size: 18px; font-weight: bold;">${property.parkingSpaces}</div><div style="font-size: 11px; color: #666;">Vagas</div></div>
+                        <div style="text-align: center;"><div style="font-size: 24px;">📐</div><div style="font-size: 18px; font-weight: bold; color: ${settings.primaryColor};">${property.totalArea}m²</div><div style="font-size: 11px; color: #666;">Área Total</div></div>
+                        <div style="text-align: center;"><div style="font-size: 24px;">🛏️</div><div style="font-size: 18px; font-weight: bold; color: ${settings.primaryColor};">${property.bedrooms}</div><div style="font-size: 11px; color: #666;">Quartos</div></div>
+                        <div style="text-align: center;"><div style="font-size: 24px;">🚿</div><div style="font-size: 18px; font-weight: bold; color: ${settings.primaryColor};">${property.bathrooms}</div><div style="font-size: 11px; color: #666;">Banheiros</div></div>
+                        <div style="text-align: center;"><div style="font-size: 24px;">🚗</div><div style="font-size: 18px; font-weight: bold; color: ${settings.primaryColor};">${property.parkingSpaces}</div><div style="font-size: 11px; color: #666;">Vagas</div></div>
                     </div>
 
                     <div style="margin-bottom: 25px;">

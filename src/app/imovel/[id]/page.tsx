@@ -115,10 +115,11 @@ export default async function PublicPropertyPage({ params }: Props) {
                         <div className={styles.priceBox} style={{ '--accent': settings.accentColor } as React.CSSProperties}>
                             <span className={styles.priceLabel}>Valor</span>
                             <span className={styles.price}>{formatCurrency(property.price)}</span>
-                            {(property.condoFee || property.iptu) && (
+                            {(property.condoFee || property.iptu || property.outstandingBalance) && (
                                 <div className={styles.fees}>
                                     {property.condoFee && <span>Condomínio: {formatCurrency(property.condoFee)}/mês</span>}
                                     {property.iptu && <span>IPTU: {formatCurrency(property.iptu)}/ano</span>}
+                                    {property.outstandingBalance != null && <span>Saldo devedor: {formatCurrency(property.outstandingBalance)}</span>}
                                 </div>
                             )}
                         </div>
@@ -206,6 +207,7 @@ export default async function PublicPropertyPage({ params }: Props) {
                                 price: property.price,
                                 condoFee: property.condoFee,
                                 iptu: property.iptu,
+                                outstandingBalance: property.outstandingBalance,
                                 status: property.status,
                                 photos: property.photos.map(p => ({ url: p.url })),
                             }}
@@ -213,6 +215,8 @@ export default async function PublicPropertyPage({ params }: Props) {
                                 companyName: settings.companyName,
                                 logoUrl: settings.logoUrl,
                                 primaryColor: settings.primaryColor,
+                                secondaryColor: settings.secondaryColor,
+                                accentColor: settings.accentColor,
                                 whatsappNumber: settings.whatsappNumber,
                                 email: settings.email,
                             }}

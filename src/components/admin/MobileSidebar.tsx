@@ -84,6 +84,10 @@ export default function MobileSidebar({ userName, userEmail, userRole, appName, 
                             Configurações
                         </Link>
                     )}
+                    <Link href="/dashboard/perfil" className={styles.navItem} onClick={() => setIsOpen(false)}>
+                        <span className={styles.navIcon}>👤</span>
+                        Meu Perfil
+                    </Link>
                 </nav>
 
                 <div className={styles.userSection}>

@@ -91,17 +91,33 @@ export default function NewPropertyForm({ properties }: NewPropertyFormProps) {
                         </div>
                     </div>
 
-                    <div className="form-group">
-                        <label htmlFor="address" className="form-label">Endereço *</label>
-                        <input
-                            type="text"
-                            id="address"
-                            name="address"
-                            className="form-input"
-                            placeholder="Ex: Av. Ermanno Dallari, 363"
-                            defaultValue={formData.address}
-                            required
-                        />
+                    <div className={styles.grid2}>
+                        <div className="form-group">
+                            <label htmlFor="address" className="form-label">Endereço *</label>
+                            <input
+                                type="text"
+                                id="address"
+                                name="address"
+                                className="form-input"
+                                placeholder="Ex: Av. Ermanno Dallari, 363"
+                                defaultValue={formData.address}
+                                required
+                            />
+                        </div>
+
+                        <div className="form-group">
+                            <label htmlFor="unitNumber" className="form-label">
+                                Nº da Unidade <span style={{ color: 'var(--color-text-secondary)', fontWeight: 400 }}>(interno)</span>
+                            </label>
+                            <input
+                                type="text"
+                                id="unitNumber"
+                                name="unitNumber"
+                                className="form-input"
+                                placeholder="Ex: 1201, Bloco B"
+                                defaultValue={formData.unitNumber || ''}
+                            />
+                        </div>
                     </div>
 
                     <div className={styles.grid3}>
@@ -289,6 +305,20 @@ export default function NewPropertyForm({ properties }: NewPropertyFormProps) {
                                 defaultValue={formData.iptu}
                             />
                         </div>
+                    </div>
+
+                    <div className="form-group">
+                        <label htmlFor="outstandingBalance" className="form-label">Saldo Devedor (R$)</label>
+                        <input
+                            type="number"
+                            id="outstandingBalance"
+                            name="outstandingBalance"
+                            className="form-input"
+                            placeholder="0.00"
+                            step="0.01"
+                            min="0"
+                            defaultValue={formData.outstandingBalance}
+                        />
                     </div>
 
                     <div className="form-group">

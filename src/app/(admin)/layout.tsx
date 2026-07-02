@@ -67,6 +67,10 @@ export default async function AdminLayout({
                             Configurações
                         </Link>
                     )}
+                    <Link href="/dashboard/perfil" className={styles.navItem}>
+                        <span className={styles.navIcon}>👤</span>
+                        Meu Perfil
+                    </Link>
                 </nav>
 
                 <div className={styles.userSection}>

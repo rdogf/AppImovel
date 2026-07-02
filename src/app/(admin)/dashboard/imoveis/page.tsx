@@ -31,7 +31,17 @@ export default async function ImoveisPage({ searchParams }: Props) {
             ]
         };
     } else if (userRole === 'user') {
-        userFilter = { userId };
+        // Coordenadores veem (e podem editar) todas as fichas da sua organização
+        const orgId = session?.user?.parentId;
+        userFilter = orgId
+            ? {
+                OR: [
+                    { userId },
+                    { userId: orgId },
+                    { user: { parentId: orgId } },
+                ]
+            }
+            : { userId };
     }
 
     const baseFilter = { active: true, ...userFilter };
@@ -80,6 +90,8 @@ export default async function ImoveisPage({ searchParams }: Props) {
         companyName: userSettings?.companyName || 'Imobiliária',
         logoUrl: userSettings?.logoUrl || null,
         primaryColor: userSettings?.primaryColor || '#1a1a2e',
+        secondaryColor: userSettings?.secondaryColor || '#e94560',
+        accentColor: userSettings?.accentColor || '#f5a623',
         whatsappNumber: userSettings?.whatsappNumber || null,
         email: userSettings?.email || null,
     };
@@ -235,6 +247,7 @@ export default async function ImoveisPage({ searchParams }: Props) {
                                         price: property.price,
                                         condoFee: property.condoFee,
                                         iptu: property.iptu,
+                                        outstandingBalance: property.outstandingBalance,
                                         status: property.status,
                                         photos: property.photos.map(p => ({ url: p.url })),
                                     }}

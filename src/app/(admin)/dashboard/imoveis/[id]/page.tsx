@@ -3,6 +3,7 @@ import Link from 'next/link';
 import prisma from '@/lib/prisma';
 import { auth } from '@/lib/auth';
 import { updateProperty, deleteProperty, deletePhoto } from '../actions';
+import { canEditProperty } from '@/lib/permissions';
 import { updatePhotoOrder } from './photo-actions';
 import PhotoManager from '@/components/admin/PhotoManager';
 import styles from '../novo/page.module.css';
@@ -32,6 +33,7 @@ export default async function EditarImovelPage({ params }: Props) {
         include: {
             photos: { orderBy: { order: 'asc' } },
             user: true,
+            history: { orderBy: { createdAt: 'desc' }, take: 50 },
         },
     });
 
@@ -43,9 +45,16 @@ export default async function EditarImovelPage({ params }: Props) {
     const isMaster = session?.user?.role === 'master';
     const isParentAdmin = session?.user?.role === 'admin' && property.user?.parentId === session?.user?.id;
 
-    if (!isMaster && !isOwner && !isParentAdmin) {
+    const canEdit = session?.user
+        ? canEditProperty(session.user, property)
+        : false;
+
+    if (!canEdit) {
         redirect('/dashboard/imoveis');
     }
+
+    // Excluir permanece restrito ao dono, ao admin responsável e ao master
+    const canDelete = isMaster || isOwner || isParentAdmin;
 
     const updatePropertyWithId = updateProperty.bind(null, id);
     const deletePhotoAction = async (photoId: string) => {
@@ -69,11 +78,13 @@ export default async function EditarImovelPage({ params }: Props) {
                         <CopyUrlButton propertyId={id} />
                     </div>
                 </div>
-                <form action={deleteProperty.bind(null, id)}>
-                    <button type="submit" className="btn btn-ghost" style={{ color: 'var(--color-danger)' }}>
-                        Excluir
-                    </button>
-                </form>
+                {canDelete && (
+                    <form action={deleteProperty.bind(null, id)}>
+                        <button type="submit" className="btn btn-ghost" style={{ color: 'var(--color-danger)' }}>
+                            Excluir
+                        </button>
+                    </form>
+                )}
             </header>
 
             <form action={updatePropertyWithId} className={styles.form}>
@@ -108,16 +119,32 @@ export default async function EditarImovelPage({ params }: Props) {
                         </div>
                     </div>
 
-                    <div className="form-group">
-                        <label htmlFor="address" className="form-label">Endereço *</label>
-                        <input
-                            type="text"
-                            id="address"
-                            name="address"
-                            className="form-input"
-                            defaultValue={property.address}
-                            required
-                        />
+                    <div className={styles.grid2}>
+                        <div className="form-group">
+                            <label htmlFor="address" className="form-label">Endereço *</label>
+                            <input
+                                type="text"
+                                id="address"
+                                name="address"
+                                className="form-input"
+                                defaultValue={property.address}
+                                required
+                            />
+                        </div>
+
+                        <div className="form-group">
+                            <label htmlFor="unitNumber" className="form-label">
+                                Nº da Unidade <span style={{ color: 'var(--color-text-secondary)', fontWeight: 400 }}>(interno)</span>
+                            </label>
+                            <input
+                                type="text"
+                                id="unitNumber"
+                                name="unitNumber"
+                                className="form-input"
+                                placeholder="Ex: 1201, Bloco B"
+                                defaultValue={property.unitNumber ?? ''}
+                            />
+                        </div>
                     </div>
 
                     <div className={styles.grid3}>
@@ -296,6 +323,19 @@ export default async function EditarImovelPage({ params }: Props) {
                     </div>
 
                     <div className="form-group">
+                        <label htmlFor="outstandingBalance" className="form-label">Saldo Devedor (R$)</label>
+                        <input
+                            type="number"
+                            id="outstandingBalance"
+                            name="outstandingBalance"
+                            className="form-input"
+                            defaultValue={property.outstandingBalance ?? ''}
+                            step="0.01"
+                            min="0"
+                        />
+                    </div>
+
+                    <div className="form-group">
                         <label className={styles.checkboxLabel}>
                             <input type="checkbox" name="featured" defaultChecked={property.featured} />
                             <span>Destacar este imóvel</span>
@@ -336,6 +376,46 @@ export default async function EditarImovelPage({ params }: Props) {
                         Abrir
                     </Link>
                 </div>
+            </div>
+
+            {/* Histórico de Alterações (visível apenas para staff logado) */}
+            <div className={styles.section}>
+                <h2 className={styles.sectionTitle}>🕓 Histórico de Alterações</h2>
+                {property.history.length === 0 ? (
+                    <p style={{ color: 'var(--color-text-secondary)' }}>Nenhuma alteração registrada ainda.</p>
+                ) : (
+                    <ul style={{ listStyle: 'none', margin: 0, padding: 0, display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                        {property.history.map((entry) => {
+                            const roleLabel = entry.userRole === 'master' ? 'Master'
+                                : entry.userRole === 'admin' ? 'Admin'
+                                : entry.userRole === 'user' ? 'Coordenador' : '—';
+                            const actionLabel = entry.action === 'create' ? 'Criou a ficha' : 'Alterou a ficha';
+                            return (
+                                <li
+                                    key={entry.id}
+                                    style={{
+                                        display: 'flex',
+                                        justifyContent: 'space-between',
+                                        alignItems: 'center',
+                                        gap: '12px',
+                                        padding: '10px 14px',
+                                        background: 'var(--color-background)',
+                                        borderRadius: 'var(--radius-md)',
+                                        border: '1px solid var(--color-border)',
+                                    }}
+                                >
+                                    <span>
+                                        <strong>{entry.userName}</strong>
+                                        <span style={{ color: 'var(--color-text-secondary)' }}> ({roleLabel}) — {actionLabel}</span>
+                                    </span>
+                                    <span style={{ color: 'var(--color-text-secondary)', fontSize: '0.85rem', whiteSpace: 'nowrap' }}>
+                                        {new Intl.DateTimeFormat('pt-BR', { dateStyle: 'short', timeStyle: 'short' }).format(entry.createdAt)}
+                                    </span>
+                                </li>
+                            );
+                        })}
+                    </ul>
+                )}
             </div>
         </div>
     );

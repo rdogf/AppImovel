@@ -6,30 +6,77 @@ import prisma from '@/lib/prisma';
 import { auth } from '@/lib/auth';
 import bcrypt from 'bcryptjs';
 
-export async function createUser(formData: FormData) {
+export interface CreateUserState {
+    error?: string;
+}
+
+export async function createUser(_prevState: CreateUserState, formData: FormData): Promise<CreateUserState> {
     const session = await auth();
     if (session?.user?.role === 'user' || !session?.user?.role) {
-        throw new Error('Unauthorized');
+        return { error: 'Você não tem permissão para criar usuários.' };
     }
 
-    const name = formData.get('name') as string;
-    const email = formData.get('email') as string;
+    const name = (formData.get('name') as string)?.trim();
+    const email = (formData.get('email') as string)?.trim().toLowerCase();
     const password = formData.get('password') as string;
+
+    if (!name || !email || !password) {
+        return { error: 'Preencha nome, e-mail e senha.' };
+    }
+    if (password.length < 6) {
+        return { error: 'A senha deve ter no mínimo 6 caracteres.' };
+    }
+
+    // Definição de papel e organização (parent)
+    let role: 'admin' | 'user';
+    let parentId: string | null;
+
+    if (session.user.role === 'master') {
+        // Master pode escolher: Admin ou Coordenador (usuário)
+        role = formData.get('role') === 'admin' ? 'admin' : 'user';
+        if (role === 'admin') {
+            parentId = null;
+        } else {
+            // Coordenador pode ser vinculado a um admin responsável (opcional)
+            const chosenParent = (formData.get('parentId') as string) || '';
+            if (chosenParent) {
+                const parent = await prisma.user.findUnique({ where: { id: chosenParent } });
+                parentId = parent && parent.role === 'admin' ? parent.id : null;
+            } else {
+                parentId = null;
+            }
+        }
+    } else {
+        // Admin sempre cria coordenadores dentro da sua organização
+        role = 'user';
+        parentId = session.user.id;
+    }
+
+    // Evita o erro de constraint exibindo mensagem amigável
+    const existing = await prisma.user.findUnique({ where: { email } });
+    if (existing) {
+        return { error: 'Já existe um usuário com este e-mail.' };
+    }
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    const role = session.user.role === 'master' ? 'admin' : 'user';
-    const parentId = session.user.role === 'master' ? null : session.user.id;
-
-    await prisma.user.create({
-        data: {
-            name,
-            email,
-            password: hashedPassword,
-            role,
-            parentId,
-        } as any,
-    });
+    try {
+        await prisma.user.create({
+            data: {
+                name,
+                email,
+                password: hashedPassword,
+                role,
+                parentId,
+            } as any,
+        });
+    } catch (error: any) {
+        if (error?.code === 'P2002') {
+            return { error: 'Já existe um usuário com este e-mail.' };
+        }
+        console.error('Failed to create user:', error);
+        return { error: 'Erro ao criar usuário. Tente novamente.' };
+    }
 
     revalidatePath('/dashboard/usuarios');
     redirect('/dashboard/usuarios');
