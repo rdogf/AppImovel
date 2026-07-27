@@ -5,6 +5,7 @@ import { createProperty, getProperty } from '../actions';
 import styles from './page.module.css';
 import { useState } from 'react';
 import ClonePropertySelect from '@/components/admin/ClonePropertySelect';
+import CurrencyInput from '@/components/admin/CurrencyInput';
 
 interface PropertySummary {
     id: string;
@@ -265,14 +266,10 @@ export default function NewPropertyForm({ properties }: NewPropertyFormProps) {
                     <div className={styles.grid3}>
                         <div className="form-group">
                             <label htmlFor="price" className="form-label">Preço (R$) *</label>
-                            <input
-                                type="number"
+                            <CurrencyInput
                                 id="price"
                                 name="price"
-                                className="form-input"
-                                placeholder="16900000.00"
-                                step="0.01"
-                                min="0"
+                                placeholder="16.900.000,00"
                                 defaultValue={formData.price}
                                 required
                             />
@@ -280,28 +277,20 @@ export default function NewPropertyForm({ properties }: NewPropertyFormProps) {
 
                         <div className="form-group">
                             <label htmlFor="condoFee" className="form-label">Condomínio (R$/mês)</label>
-                            <input
-                                type="number"
+                            <CurrencyInput
                                 id="condoFee"
                                 name="condoFee"
-                                className="form-input"
-                                placeholder="1200.00"
-                                step="0.01"
-                                min="0"
+                                placeholder="1.200,00"
                                 defaultValue={formData.condoFee}
                             />
                         </div>
 
                         <div className="form-group">
                             <label htmlFor="iptu" className="form-label">IPTU (R$/ano)</label>
-                            <input
-                                type="number"
+                            <CurrencyInput
                                 id="iptu"
                                 name="iptu"
-                                className="form-input"
-                                placeholder="29000.00"
-                                step="0.01"
-                                min="0"
+                                placeholder="29.000,00"
                                 defaultValue={formData.iptu}
                             />
                         </div>
@@ -309,14 +298,10 @@ export default function NewPropertyForm({ properties }: NewPropertyFormProps) {
 
                     <div className="form-group">
                         <label htmlFor="outstandingBalance" className="form-label">Saldo Devedor (R$)</label>
-                        <input
-                            type="number"
+                        <CurrencyInput
                             id="outstandingBalance"
                             name="outstandingBalance"
-                            className="form-input"
-                            placeholder="0.00"
-                            step="0.01"
-                            min="0"
+                            placeholder="314.331,48"
                             defaultValue={formData.outstandingBalance}
                         />
                     </div>

@@ -9,6 +9,7 @@ import PhotoManager from '@/components/admin/PhotoManager';
 import styles from '../novo/page.module.css';
 import editStyles from './page.module.css';
 import CopyUrlButton from '@/components/admin/CopyUrlButton';
+import CurrencyInput from '@/components/admin/CurrencyInput';
 
 interface Props {
     params: Promise<{ id: string }>;
@@ -283,55 +284,39 @@ export default async function EditarImovelPage({ params }: Props) {
                     <div className={styles.grid3}>
                         <div className="form-group">
                             <label htmlFor="price" className="form-label">Preço (R$) *</label>
-                            <input
-                                type="number"
+                            <CurrencyInput
                                 id="price"
                                 name="price"
-                                className="form-input"
                                 defaultValue={property.price}
-                                step="0.01"
-                                min="0"
                                 required
                             />
                         </div>
 
                         <div className="form-group">
                             <label htmlFor="condoFee" className="form-label">Condomínio (R$/mês)</label>
-                            <input
-                                type="number"
+                            <CurrencyInput
                                 id="condoFee"
                                 name="condoFee"
-                                className="form-input"
-                                defaultValue={property.condoFee ?? ''}
-                                step="0.01"
-                                min="0"
+                                defaultValue={property.condoFee}
                             />
                         </div>
 
                         <div className="form-group">
                             <label htmlFor="iptu" className="form-label">IPTU (R$/ano)</label>
-                            <input
-                                type="number"
+                            <CurrencyInput
                                 id="iptu"
                                 name="iptu"
-                                className="form-input"
-                                defaultValue={property.iptu ?? ''}
-                                step="0.01"
-                                min="0"
+                                defaultValue={property.iptu}
                             />
                         </div>
                     </div>
 
                     <div className="form-group">
                         <label htmlFor="outstandingBalance" className="form-label">Saldo Devedor (R$)</label>
-                        <input
-                            type="number"
+                        <CurrencyInput
                             id="outstandingBalance"
                             name="outstandingBalance"
-                            className="form-input"
-                            defaultValue={property.outstandingBalance ?? ''}
-                            step="0.01"
-                            min="0"
+                            defaultValue={property.outstandingBalance}
                         />
                     </div>
 
