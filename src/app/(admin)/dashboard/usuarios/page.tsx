@@ -3,6 +3,7 @@ import { auth } from '@/lib/auth';
 import { redirect } from 'next/navigation';
 import { toggleUserActive } from './actions';
 import AddUserForm from './AddUserForm';
+import ResetPasswordForm from './ResetPasswordForm';
 import styles from './page.module.css';
 
 export default async function UsuariosPage() {
@@ -71,6 +72,7 @@ export default async function UsuariosPage() {
                         </div>
                         {user.role !== 'master' && (
                             <div className={styles.userActions}>
+                                <ResetPasswordForm userId={user.id} />
                                 <form action={toggleUserActive.bind(null, user.id)}>
                                     <button
                                         type="submit"

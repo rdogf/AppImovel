@@ -82,6 +82,39 @@ export async function createUser(_prevState: CreateUserState, formData: FormData
     redirect('/dashboard/usuarios');
 }
 
+export interface ResetPasswordState {
+    error?: string;
+    ok?: boolean;
+}
+
+export async function resetUserPassword(id: string, _prevState: ResetPasswordState, formData: FormData): Promise<ResetPasswordState> {
+    const session = await auth();
+    if (session?.user?.role === 'user' || !session?.user?.role) {
+        return { error: 'Você não tem permissão para alterar senhas.' };
+    }
+
+    const targetUser = await prisma.user.findUnique({ where: { id } });
+    if (!targetUser || targetUser.role === 'master') {
+        return { error: 'Usuário não encontrado.' };
+    }
+    if (session.user.role !== 'master' && targetUser.parentId !== session.user.id) {
+        return { error: 'Você não tem permissão para alterar a senha deste usuário.' };
+    }
+
+    const password = formData.get('password') as string;
+    if (!password || password.length < 6) {
+        return { error: 'A senha deve ter no mínimo 6 caracteres.' };
+    }
+
+    await prisma.user.update({
+        where: { id },
+        data: { password: await bcrypt.hash(password, 10) },
+    });
+
+    revalidatePath('/dashboard/usuarios');
+    return { ok: true };
+}
+
 export async function updateUser(id: string, formData: FormData) {
     const session = await auth();
     if (session?.user?.role === 'user' || !session?.user?.role) {
