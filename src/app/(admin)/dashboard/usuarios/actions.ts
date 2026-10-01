@@ -95,8 +95,8 @@ export async function updateUser(id: string, formData: FormData) {
         throw new Error('Unauthorized');
     }
 
-    const name = formData.get('name') as string;
-    const email = formData.get('email') as string;
+    const name = (formData.get('name') as string)?.trim();
+    const email = (formData.get('email') as string)?.trim().toLowerCase();
     const password = formData.get('password') as string;
 
     const data: { name: string; email: string; password?: string } = {

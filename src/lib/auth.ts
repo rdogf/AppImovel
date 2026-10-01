@@ -40,12 +40,16 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
                     return null;
                 }
 
-                const email = credentials.email as string;
+                // Celular costuma colocar maiúscula na 1ª letra e o autocompletar deixa espaço no fim
+                const typedEmail = (credentials.email as string).trim();
+                const email = typedEmail.toLowerCase();
                 const password = credentials.password as string;
 
-                const user = await prisma.user.findUnique({
-                    where: { email },
-                });
+                const user =
+                    (await prisma.user.findUnique({ where: { email } })) ??
+                    (typedEmail !== email
+                        ? await prisma.user.findUnique({ where: { email: typedEmail } })
+                        : null);
 
                 if (!user || !user.active) {
                     return null;
