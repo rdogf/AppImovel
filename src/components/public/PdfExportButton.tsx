@@ -58,7 +58,7 @@ export default function PdfExportButton({ property, settings, variant = 'default
             const { default: jsPDF } = await import('jspdf');
             const { default: html2canvas } = await import('html2canvas');
 
-            const pdf = new jsPDF('p', 'mm', 'a4');
+            const pdf = new jsPDF({ orientation: 'p', unit: 'mm', format: 'a4', compress: true });
             const pdfWidth = pdf.internal.pageSize.getWidth();
 
             const addPageToPdf = async (htmlContent: string, isFirstPage: boolean = false) => {
@@ -78,7 +78,7 @@ export default function PdfExportButton({ property, settings, variant = 'default
                 await new Promise(resolve => setTimeout(resolve, 500));
 
                 const canvas = await html2canvas(container, {
-                    scale: 2,
+                    scale: 1.5,
                     useCORS: true,
                     allowTaint: true,
                     backgroundColor: '#ffffff',
@@ -89,9 +89,9 @@ export default function PdfExportButton({ property, settings, variant = 'default
                     pdf.addPage();
                 }
 
-                const imgData = canvas.toDataURL('image/png');
+                const imgData = canvas.toDataURL('image/jpeg', 0.75);
                 const imgHeight = (canvas.height * pdfWidth) / canvas.width;
-                pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, imgHeight);
+                pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, imgHeight, undefined, 'FAST');
 
                 document.body.removeChild(container);
             };
