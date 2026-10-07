@@ -4,6 +4,7 @@ import { formatCurrency, formatArea, getPropertyTypeLabel } from '@/lib/utils';
 import ShareButtons from '@/components/public/ShareButtons';
 import ImageGallery from '@/components/public/ImageGallery';
 import PdfExportButton from '@/components/public/PdfExportButton';
+import WordExportButton from '@/components/public/WordExportButton';
 import styles from './page.module.css';
 
 interface Props {
@@ -192,6 +193,37 @@ export default async function PublicPropertyPage({ params }: Props) {
                         <PdfExportButton
                             property={{
                                 id: property.id,
+                                title: property.title,
+                                address: property.address,
+                                neighborhood: property.neighborhood,
+                                city: property.city,
+                                state: property.state,
+                                totalArea: property.totalArea,
+                                propertyType: property.propertyType,
+                                bedrooms: property.bedrooms,
+                                suites: property.suites,
+                                bathrooms: property.bathrooms,
+                                parkingSpaces: property.parkingSpaces,
+                                characteristics: property.characteristics,
+                                price: property.price,
+                                condoFee: property.condoFee,
+                                iptu: property.iptu,
+                                outstandingBalance: property.outstandingBalance,
+                                status: property.status,
+                                photos: property.photos.map(p => ({ url: p.url })),
+                            }}
+                            settings={{
+                                companyName: settings.companyName,
+                                logoUrl: settings.logoUrl,
+                                primaryColor: settings.primaryColor,
+                                secondaryColor: settings.secondaryColor,
+                                accentColor: settings.accentColor,
+                                whatsappNumber: settings.whatsappNumber,
+                                email: settings.email,
+                            }}
+                        />
+                        <WordExportButton
+                            property={{
                                 title: property.title,
                                 address: property.address,
                                 neighborhood: property.neighborhood,

@@ -4,6 +4,7 @@ import { formatCurrency, getPropertyTypeLabel } from '@/lib/utils';
 import { auth } from '@/lib/auth';
 import PropertyFilters from '@/components/admin/PropertyFilters';
 import PropertyPdfButton from '@/components/admin/PropertyPdfButton';
+import WordExportButton from '@/components/public/WordExportButton';
 import styles from './page.module.css';
 
 interface Props {
@@ -232,6 +233,30 @@ export default async function ImoveisPage({ searchParams }: Props) {
                                 <PropertyPdfButton
                                     property={{
                                         id: property.id,
+                                        title: property.title,
+                                        address: property.address,
+                                        neighborhood: property.neighborhood,
+                                        city: property.city,
+                                        state: property.state,
+                                        totalArea: property.totalArea,
+                                        propertyType: property.propertyType,
+                                        bedrooms: property.bedrooms,
+                                        suites: property.suites,
+                                        bathrooms: property.bathrooms,
+                                        parkingSpaces: property.parkingSpaces,
+                                        characteristics: property.characteristics,
+                                        price: property.price,
+                                        condoFee: property.condoFee,
+                                        iptu: property.iptu,
+                                        outstandingBalance: property.outstandingBalance,
+                                        status: property.status,
+                                        photos: property.photos.map(p => ({ url: p.url })),
+                                    }}
+                                    settings={pdfSettings}
+                                />
+                                <WordExportButton
+                                    variant="small"
+                                    property={{
                                         title: property.title,
                                         address: property.address,
                                         neighborhood: property.neighborhood,
