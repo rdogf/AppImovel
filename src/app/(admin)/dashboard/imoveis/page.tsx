@@ -249,6 +249,7 @@ export default async function ImoveisPage({ searchParams }: Props) {
                                         condoFee: property.condoFee,
                                         iptu: property.iptu,
                                         outstandingBalance: property.outstandingBalance,
+                                        outstandingBalanceRef: property.outstandingBalanceRef,
                                         status: property.status,
                                         photos: property.photos.map(p => ({ url: p.url })),
                                     }}
@@ -273,6 +274,7 @@ export default async function ImoveisPage({ searchParams }: Props) {
                                         condoFee: property.condoFee,
                                         iptu: property.iptu,
                                         outstandingBalance: property.outstandingBalance,
+                                        outstandingBalanceRef: property.outstandingBalanceRef,
                                         status: property.status,
                                         photos: property.photos.map(p => ({ url: p.url })),
                                     }}

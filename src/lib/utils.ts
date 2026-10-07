@@ -18,6 +18,22 @@ export function formatCurrency(value: number): string {
 }
 
 /**
+ * Mês/ano de referência do saldo devedor: "2026-10" -> "10/2026"
+ */
+export function formatBalanceRef(ref: string | null | undefined): string {
+    const match = ref?.match(/^(\d{4})-(\d{2})$/);
+    return match ? `${match[2]}/${match[1]}` : '';
+}
+
+/**
+ * Saldo devedor com o mês/ano de referência, ex.: "R$ 314.331,48 (ref. 10/2026)"
+ */
+export function formatOutstandingBalance(value: number, ref?: string | null): string {
+    const month = formatBalanceRef(ref);
+    return `${formatCurrency(value)}${month ? ` (ref. ${month})` : ''}`;
+}
+
+/**
  * Format number with Brazilian locale
  */
 export function formatNumber(value: number): string {

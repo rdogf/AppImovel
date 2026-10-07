@@ -89,6 +89,7 @@ model Property {
   condoFee        Float?
   iptu            Float?
   outstandingBalance Float?               // Saldo devedor (visível a todos)
+  outstandingBalanceRef String?           // Mês/ano de referência do saldo devedor ("AAAA-MM")
   unitNumber      String?                 // Número da unidade (interno: staff apenas)
   status          String   @default("disponivel") // disponivel, vendido, reservado, alugado
   featured        Boolean  @default(false)

@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import styles from '../public/PdfExportButton.module.css';
+import { formatOutstandingBalance } from '@/lib/utils';
 
 interface PropertyPdfButtonProps {
     property: {
@@ -22,6 +23,7 @@ interface PropertyPdfButtonProps {
         condoFee: number | null;
         iptu: number | null;
         outstandingBalance: number | null;
+    outstandingBalanceRef?: string | null;
         status: string;
         photos: { url: string }[];
     };
@@ -124,7 +126,7 @@ export default function PropertyPdfButton({ property, settings }: PropertyPdfBut
                         <p style="margin: 0; color: ${settings.accentColor}; font-size: 28px; font-weight: bold;">${formatCurrency(property.price)}</p>
                         ${property.condoFee ? `<p style="margin: 5px 0 0 0; color: #666; font-size: 12px;">Condomínio: ${formatCurrency(property.condoFee)}/mês</p>` : ''}
                         ${property.iptu ? `<p style="margin: 3px 0 0 0; color: #666; font-size: 12px;">IPTU: ${formatCurrency(property.iptu)}/ano</p>` : ''}
-                        ${property.outstandingBalance != null ? `<p style="margin: 3px 0 0 0; color: #666; font-size: 12px;">Saldo devedor: ${formatCurrency(property.outstandingBalance)}</p>` : ''}
+                        ${property.outstandingBalance != null ? `<p style="margin: 3px 0 0 0; color: #666; font-size: 12px;">Saldo devedor: ${formatOutstandingBalance(property.outstandingBalance, property.outstandingBalanceRef)}</p>` : ''}
                     </div>
 
                     <!-- Features -->

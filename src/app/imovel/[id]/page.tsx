@@ -1,6 +1,6 @@
 import { notFound } from 'next/navigation';
 import prisma from '@/lib/prisma';
-import { formatCurrency, formatArea, getPropertyTypeLabel } from '@/lib/utils';
+import { formatCurrency, formatArea, getPropertyTypeLabel, formatOutstandingBalance } from '@/lib/utils';
 import ShareButtons from '@/components/public/ShareButtons';
 import ImageGallery from '@/components/public/ImageGallery';
 import PdfExportButton from '@/components/public/PdfExportButton';
@@ -120,7 +120,7 @@ export default async function PublicPropertyPage({ params }: Props) {
                                 <div className={styles.fees}>
                                     {property.condoFee && <span>Condomínio: {formatCurrency(property.condoFee)}/mês</span>}
                                     {property.iptu && <span>IPTU: {formatCurrency(property.iptu)}/ano</span>}
-                                    {property.outstandingBalance != null && <span>Saldo devedor: {formatCurrency(property.outstandingBalance)}</span>}
+                                    {property.outstandingBalance != null && <span>Saldo devedor: {formatOutstandingBalance(property.outstandingBalance, property.outstandingBalanceRef)}</span>}
                                 </div>
                             )}
                         </div>
@@ -209,6 +209,7 @@ export default async function PublicPropertyPage({ params }: Props) {
                                 condoFee: property.condoFee,
                                 iptu: property.iptu,
                                 outstandingBalance: property.outstandingBalance,
+                                outstandingBalanceRef: property.outstandingBalanceRef,
                                 status: property.status,
                                 photos: property.photos.map(p => ({ url: p.url })),
                             }}
@@ -240,6 +241,7 @@ export default async function PublicPropertyPage({ params }: Props) {
                                 condoFee: property.condoFee,
                                 iptu: property.iptu,
                                 outstandingBalance: property.outstandingBalance,
+                                outstandingBalanceRef: property.outstandingBalanceRef,
                                 status: property.status,
                                 photos: property.photos.map(p => ({ url: p.url })),
                             }}

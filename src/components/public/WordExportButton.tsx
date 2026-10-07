@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import styles from './PdfExportButton.module.css';
+import { formatOutstandingBalance } from '@/lib/utils';
 
 interface PropertyData {
     id?: string;
@@ -21,6 +22,7 @@ interface PropertyData {
     condoFee: number | null;
     iptu: number | null;
     outstandingBalance: number | null;
+    outstandingBalanceRef?: string | null;
     status: string;
     photos: { url: string }[];
 }
@@ -154,7 +156,7 @@ export default function WordExportButton({ property, settings, variant = 'defaul
             const extras = [
                 property.condoFee ? `Condomínio: ${formatCurrency(property.condoFee)}/mês` : null,
                 property.iptu ? `IPTU: ${formatCurrency(property.iptu)}/ano` : null,
-                property.outstandingBalance != null ? `Saldo devedor: ${formatCurrency(property.outstandingBalance)}` : null,
+                property.outstandingBalance != null ? `Saldo devedor: ${formatOutstandingBalance(property.outstandingBalance, property.outstandingBalanceRef)}` : null,
             ].filter(Boolean) as string[];
             for (const text of extras) {
                 children.push(new Paragraph({ children: [new TextRun({ text, size: 18, color: '666666' })] }));

@@ -307,6 +307,17 @@ export default function NewPropertyForm({ properties }: NewPropertyFormProps) {
                     </div>
 
                     <div className="form-group">
+                        <label htmlFor="outstandingBalanceRef" className="form-label">Mês/ano do saldo devedor</label>
+                        <input
+                            type="month"
+                            id="outstandingBalanceRef"
+                            name="outstandingBalanceRef"
+                            className="form-input"
+                            defaultValue={formData.outstandingBalanceRef || ''}
+                        />
+                    </div>
+
+                    <div className="form-group">
                         <label className={styles.checkboxLabel}>
                             <input type="checkbox" name="featured" defaultChecked={formData.featured} />
                             <span>Destacar este imóvel</span>
