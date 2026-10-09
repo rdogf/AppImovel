@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import styles from './PdfExportButton.module.css';
-import { formatOutstandingBalance } from '@/lib/utils';
+import { formatOutstandingBalance, getFloorLevelLabel } from '@/lib/utils';
 
 interface PropertyData {
     id?: string;
@@ -23,6 +23,7 @@ interface PropertyData {
     iptu: number | null;
     outstandingBalance: number | null;
     outstandingBalanceRef?: string | null;
+    floorLevel?: string | null;
     status: string;
     photos: { url: string }[];
 }
@@ -134,6 +135,7 @@ export default function PdfExportButton({ property, settings, variant = 'default
                         <div style="text-align: center;"><div style="font-size: 24px;">🛏️</div><div style="font-size: 18px; font-weight: bold; color: ${settings.primaryColor};">${property.bedrooms}</div><div style="font-size: 11px; color: #666;">Quartos</div></div>
                         <div style="text-align: center;"><div style="font-size: 24px;">🚿</div><div style="font-size: 18px; font-weight: bold; color: ${settings.primaryColor};">${property.bathrooms}</div><div style="font-size: 11px; color: #666;">Banheiros</div></div>
                         <div style="text-align: center;"><div style="font-size: 24px;">🚗</div><div style="font-size: 18px; font-weight: bold; color: ${settings.primaryColor};">${property.parkingSpaces}</div><div style="font-size: 11px; color: #666;">Vagas</div></div>
+                        ${getFloorLevelLabel(property.floorLevel) ? `<div style="text-align: center;"><div style="font-size: 24px;">🏢</div><div style="font-size: 18px; font-weight: bold; color: ${settings.primaryColor};">${getFloorLevelLabel(property.floorLevel)}</div><div style="font-size: 11px; color: #666;">Andar</div></div>` : ''}
                     </div>
 
                     <div style="margin-bottom: 25px;">

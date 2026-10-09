@@ -84,6 +84,7 @@ model Property {
   suites          Int      @default(0)
   bathrooms       Int      @default(0)
   parkingSpaces   Int      @default(0)
+  floorLevel      String?  // Andar: "baixo" | "medio" | "alto" (dá ideia da altura sem revelar a unidade)
   characteristics String   // Descrição detalhada
   price           Float
   condoFee        Float?

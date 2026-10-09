@@ -248,6 +248,16 @@ export default function NewPropertyForm({ properties }: NewPropertyFormProps) {
                     </div>
 
                     <div className="form-group">
+                        <label htmlFor="floorLevel" className="form-label">Andar</label>
+                        <select id="floorLevel" name="floorLevel" className="form-select" defaultValue={formData.floorLevel || ''}>
+                            <option value="">Não informar</option>
+                            <option value="baixo">Baixo</option>
+                            <option value="medio">Médio</option>
+                            <option value="alto">Alto</option>
+                        </select>
+                    </div>
+
+                    <div className="form-group">
                         <label htmlFor="characteristics" className="form-label">Descrição / Características</label>
                         <textarea
                             id="characteristics"

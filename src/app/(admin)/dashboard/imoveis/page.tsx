@@ -250,6 +250,7 @@ export default async function ImoveisPage({ searchParams }: Props) {
                                         iptu: property.iptu,
                                         outstandingBalance: property.outstandingBalance,
                                         outstandingBalanceRef: property.outstandingBalanceRef,
+                                        floorLevel: property.floorLevel,
                                         status: property.status,
                                         photos: property.photos.map(p => ({ url: p.url })),
                                     }}
@@ -275,6 +276,7 @@ export default async function ImoveisPage({ searchParams }: Props) {
                                         iptu: property.iptu,
                                         outstandingBalance: property.outstandingBalance,
                                         outstandingBalanceRef: property.outstandingBalanceRef,
+                                        floorLevel: property.floorLevel,
                                         status: property.status,
                                         photos: property.photos.map(p => ({ url: p.url })),
                                     }}

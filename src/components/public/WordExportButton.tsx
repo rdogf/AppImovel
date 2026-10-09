@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import styles from './PdfExportButton.module.css';
-import { formatOutstandingBalance } from '@/lib/utils';
+import { formatOutstandingBalance, getFloorLevelLabel } from '@/lib/utils';
 
 interface PropertyData {
     id?: string;
@@ -23,6 +23,7 @@ interface PropertyData {
     iptu: number | null;
     outstandingBalance: number | null;
     outstandingBalanceRef?: string | null;
+    floorLevel?: string | null;
     status: string;
     photos: { url: string }[];
 }
@@ -167,7 +168,7 @@ export default function WordExportButton({ property, settings, variant = 'defaul
                 new Paragraph({
                     children: [
                         new TextRun({
-                            text: `Área: ${property.totalArea}m²   •   Quartos: ${property.bedrooms}   •   Banheiros: ${property.bathrooms}   •   Vagas: ${property.parkingSpaces}`,
+                            text: `Área: ${property.totalArea}m²   •   Quartos: ${property.bedrooms}   •   Banheiros: ${property.bathrooms}   •   Vagas: ${property.parkingSpaces}${getFloorLevelLabel(property.floorLevel) ? `   •   Andar: ${getFloorLevelLabel(property.floorLevel)}` : ''}`,
                             bold: true,
                             size: 22,
                             color: primary,

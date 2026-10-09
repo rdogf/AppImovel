@@ -93,6 +93,14 @@ export function getPropertyTypeLabel(type: string): string {
 }
 
 /**
+ * Label do andar (baixo/médio/alto)
+ */
+export function getFloorLevelLabel(level: string | null | undefined): string | null {
+    const labels: Record<string, string> = { baixo: 'Baixo', medio: 'Médio', alto: 'Alto' };
+    return level ? labels[level] || null : null;
+}
+
+/**
  * Truncate text with ellipsis
  */
 export function truncate(text: string, maxLength: number): string {
